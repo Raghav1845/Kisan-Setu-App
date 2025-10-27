@@ -1,0 +1,1717 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kisan Setu App Prototype</title>
+    <!-- Tailwind CSS CDN for modern styling -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom font and layout setup for mobile view */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+        .app-container {
+            width: 100%;
+            max-width: 400px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            background-color: #fff;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+        .header {
+            padding: 1rem 1rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #eee;
+        }
+        .input-group, .select-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            /* Added for UI consistency */
+            width: 100%; 
+        }
+        .input-label {
+            padding: 0.75rem 1rem;
+            background-color: #e9ecef;
+            color: #495057;
+            font-size: 0.875rem;
+            white-space: nowrap;
+            font-weight: 500;
+        }
+        input[type="text"], input[type="number"], select, textarea {
+            flex-grow: 1;
+            padding: 0.75rem 1rem;
+            border: none;
+            outline: none;
+            background-color: transparent;
+        }
+        .btn-primary {
+            background-color: #38a169; /* Green for primary action */
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+        .btn-primary:hover {
+            background-color: #276749;
+        }
+        .chat-bubble {
+            max-width: 80%;
+            padding: 8px 12px;
+            border-radius: 15px;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+        .chat-farmer {
+            align-self: flex-end;
+            background-color: #D1FAE5; /* Light Green */
+            border-bottom-right-radius: 5px;
+        }
+        .chat-buyer {
+            align-self: flex-start;
+            background-color: #EBF8FF; /* Light Blue */
+            border-bottom-left-radius: 5px;
+        }
+        /* Custom Styles to match User UI */
+        .dashboard-header {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700; /* font-bold */
+            margin-bottom: 0.5rem;
+        }
+        .welcome-text {
+            font-size: 1.25rem; /* text-xl */
+            font-weight: 600; /* font-semibold */
+            margin-bottom: 1.5rem;
+            color: #4B5563; /* Gray-600 */
+            border-bottom: 2px solid #D1D5DB; /* Gray-300 */
+            padding-bottom: 5px;
+        }
+        .active-offer-card {
+            background-color: white;
+            border-radius: 1rem;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        }
+        /* DITTO LOGIN SCREEN FIXES */
+        .login-input-group {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ddd;
+            border-radius: 0.5rem;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            padding: 0;
+        }
+        .login-input-group input {
+            border: none;
+            padding: 0.75rem;
+            width: 100%;
+        }
+        /* Dashboard USP Card DITTO */
+        .usp-card-ditto {
+            background-color: #FFFBEB; /* Light Yellow */
+            border: 2px solid #38A169; /* Green border */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        /* Menu bar styling */
+        .menu-item {
+            display: block;
+            width: 100%;
+            text-align: left;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #eee;
+            font-weight: 500;
+        }
+        /* Horizontal Scrollable Menu Container */
+        .scroll-menu-container {
+            position: relative;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+        }
+        .scroll-menu {
+            overflow-x: auto;
+            white-space: nowrap;
+            padding: 5px 0;
+            -webkit-overflow-scrolling: touch;
+            flex-grow: 1;
+        }
+        .scroll-menu::-webkit-scrollbar {
+            display: none;
+        }
+        .scroll-item {
+            display: inline-block;
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-right: 10px;
+            cursor: pointer;
+            box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+        }
+        .scroll-arrow {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            border: 1px solid #9CA3AF;
+            color: #9CA3AF;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            flex-shrink: 0;
+            margin: 0 4px;
+        }
+        .active-offers-my-listings {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 0 10px;
+            border-bottom: 1px solid #D1D5DB;
+            margin-bottom: 1rem;
+        }
+        .active-offers-my-listings button {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: bold;
+            margin: 0 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            flex-grow: 1;
+        }
+        
+    </style>
+</head>
+<body>
+
+<div class="app-container">
+    <!-- Main Content Area - All Screens load here -->
+    <div id="app-content" class="flex-grow flex flex-col">
+        <!-- Loader to show while data is initializing -->
+        <div id="loading-screen" class="p-6 text-center pt-24">
+            <h1 class="text-xl font-semibold text-gray-700">Loading Kisan Setu...</h1>
+        </div>
+    </div>
+    
+    <!-- Confirmation Modal Structure (Hidden by default) -->
+    <div id="confirmation-modal" class="fixed inset-0 bg-black bg-opacity-50 hidden items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-xs text-center">
+            <h3 id="modal-title" class="text-lg font-bold mb-4 text-red-600"></h3>
+            <p id="modal-message" class="text-gray-700 mb-6"></p>
+            <div class="flex justify-between space-x-3">
+                <button id="modal-cancel" class="bg-gray-300 text-gray-800 font-semibold py-2 rounded-lg w-1/2"></button>
+                <button id="modal-confirm" class="bg-red-500 text-white font-semibold py-2 rounded-lg w-1/2"></button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // --- STEP A: DATA STORAGE AND INITIALIZATION (The Database/localStorage) ---
+    let appData = {
+        currentUser: null,
+        users: {}, // Stores all registered users
+        listings: [], // Stores all active/sold product listings
+        offers: [], // Stores all offers made by buyers
+        currentLanguage: 'hi' // Default language
+    };
+    
+    // TEMPORARY LISTING DATA FOR MULTI-STEP FORM
+    let currentListingData = {}; 
+
+    // Simulated Mandi Data (USP Data - Region-based prices)
+    const mandiData = {
+        'Tomato': {
+            'Pune, MH': { min: 20, max: 24, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 16, max: 20, unit: 'Kg', trend: 'stable' },
+        },
+        'Potato': {
+            'Pune, MH': { min: 20, max: 24, unit: 'Kg', trend: 'down' },
+            'Patna, BR': { min: 15, max: 19, unit: 'Kg', trend: 'up' },
+        },
+        'Onion': {
+            'Pune, MH': { min: 25, max: 30, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 21, max: 24, unit: 'Kg', trend: 'stable' },
+        },
+        'Capsicum': {
+             'Pune, MH': { min: 32, max: 34, unit: 'Kg', trend: 'down' },
+            'Patna, BR': { min: 29, max: 31, unit: 'Kg', trend: 'up' },
+        },
+        'Brinjal': {
+             'Pune, MH': { min: 25, max: 28, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 20, max: 24, unit: 'Kg', trend: 'down' },
+        },
+        'Chilli': {
+             'Pune, MH': { min: 10, max: 12, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 8, max: 10, unit: 'Kg', trend: 'stable' },
+        },
+        'Ginger': {
+             'Pune, MH': { min: 38, max: 41, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 35, max: 38, unit: 'Kg', trend: 'down' },
+        },
+        'Garlic': {
+             'Pune, MH': { min: 37, max: 42, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 35, max: 38, unit: 'Kg', trend: 'stable' },
+        },
+        'Cabbage': {
+             'Pune, MH': { min: 10, max: 12, unit: 'Kg', trend: 'down' },
+            'Patna, BR': { min: 8, max: 10, unit: 'Kg', trend: 'up' },
+        },
+        'Brocolli': {
+             'Pune, MH': { min: 30, max: 32, unit: 'Kg', trend: 'up' },
+            'Patna, BR': { min: 28, max: 30, unit: 'Kg', trend: 'stable' },
+        },
+    };
+
+    // Simulated Buyer Data (For Offers)
+    const simulatedBuyers = [
+        { id: 'b1', name: 'Mr. Ramakrishna Singh', rating: 4.5, phone: '9876543210' },
+        { id: 'b2', name: 'Mr. Sikandar Sinha', rating: 4.8, phone: '9988776655' },
+        { id: 'b3', name: 'Mrs. Kapoor', rating: 4.2, phone: '9000011111' },
+    ];
+    
+    // --- Language Translation Map (Partial for brevity, using existing keys) ---
+    const langMap = {
+        'Login': { hi: 'लॉगिन', en: 'Login' },
+        'Register': { hi: 'रजिस्टर', en: 'Register' },
+        'Validate': { hi: 'पुष्टि करें', en: 'Validate' },
+        'MobNo': { hi: 'मोबाइल नंबर', en: 'Mob. no.' },
+        'SendOTP': { hi: 'ओटीपी भेजें', en: 'Send OTP' },
+        'WhoAreYou': { hi: 'आप कौन हैं?', en: 'Who are you?' },
+        'RememberMe': { hi: 'मुझे याद रखें', en: 'Remember Me' },
+        'FullName': { hi: 'पूरा नाम', en: 'Full Name' },
+        'Address': { hi: 'पता', en: 'Address' },
+        'Farmer': { hi: 'मैं किसान हूँ', en: 'I am a Farmer' },
+        'Buyer': { hi: 'मैं ख़रीदार हूँ', en: 'I am a Buyer' },
+        'ProfileSetup': { hi: 'प्रोफ़ाइल सेट अप', en: 'Profile Setup' },
+        'Back': { hi: 'वापस', en: 'Back' },
+        'LandArea': { hi: 'ज़मीन का क्षेत्रफल (एकड़)', en: 'Land Area (Acres)' },
+        'PrimaryCrop': { hi: 'मुख्य फ़सल', en: 'Primary Crop' },
+        'StorageAvailable': { hi: 'भंडारण उपलब्ध है?', en: 'Storage Available?' },
+        'Yes': { hi: 'हाँ', en: 'Yes' },
+        'No': { hi: 'नहीं', en: 'No' },
+        'StorageCapacity': { hi: 'भंडारण क्षमता', en: 'Storage Capacity' },
+        'PreferredLanguage': { hi: 'पसंदीदा भाषा', en: 'Preferred Language' },
+        'Region': { hi: 'क्षेत्र/ज़िला', en: 'Region/District' },
+        'SaveGoDashboard': { hi: 'सेव करें और डैशबोर्ड पर जाएं', en: 'Save & Go to Dashboard' },
+        'Dashboard': { hi: 'डैशबोर्ड', en: 'Dashboard' },
+        'Welcome': { hi: 'नमस्ते', en: 'Welcome' },
+        'AddNewProduct': { hi: 'नया उत्पाद जोड़ें', en: 'Add New Product' },
+        'TodayMarketBenchmark': { hi: 'आज का सही मंडी भाव', en: "Today's Fair Market Benchmark" },
+        'ActiveOffers': { hi: 'सक्रिय प्रस्ताव', en: 'Active Offers' },
+        'MyListings': { hi: 'मेरी लिस्टिंग', en: 'My Listings' },
+        'ViewAll': { hi: 'सभी देखें', en: 'View all' },
+        'AddProduct': { hi: 'उत्पाद जोड़ें', en: 'Add Product' },
+        'Quantity': { hi: 'मात्रा', en: 'Quantity' },
+        'Unit': { hi: 'इकाई', en: 'Unit' },
+        'Grade': { hi: 'ग्रेड', en: 'Grade' },
+        'AvailabilityDate': { hi: 'उपलब्धता की तारीख', en: 'Availability Date' },
+        'ProductPhoto': { hi: 'उत्पाद की फोटो', en: 'Product Photo' },
+        'Next': { hi: 'अगला', en: 'NEXT' },
+        'Pricing': { hi: 'मूल्य निर्धारण', en: 'PRICING' },
+        'MarketRange': { hi: 'बाज़ार रेंज', en: 'Market Range' },
+        'ExpectedPrice': { hi: 'अपेक्षित मूल्य', en: 'Expected Price' },
+        'Previous': { hi: 'पिछला', en: 'PREVIOUS' },
+        'ListInMarket': { hi: 'बाज़ार में लिस्ट करें', en: 'LIST in Market' },
+        'ListedSuccessfully': { hi: 'उत्पाद सफलतापूर्वक लिस्ट हुआ', en: 'Product Listed Successfully' },
+        'Negotiate': { hi: 'मोल-भाव', en: 'Negotiate' },
+        'Accept': { hi: 'स्वीकार करें', en: 'ACCEPT' },
+        'NegotiateBtn': { hi: 'मोल-भाव करें', en: 'NEGOTIATE' },
+        'AcceptDeal': { hi: 'डील स्वीकार करें', en: 'ACCEPT DEAL' },
+        'CancelDeal': { hi: 'डील रद्द करें', en: 'CANCEL DEAL' },
+        'TypeMessage': { hi: 'अपना संदेश यहाँ लिखें...', en: 'Type your message here...' },
+        'TotalOffers': { hi: 'कुल प्रस्ताव', en: 'Total Offers' },
+        'ListedOn': { hi: 'लिस्ट किया गया', en: 'Listed On' },
+        'MarketPrice': { hi: 'बाज़ार मूल्य', en: 'Market Price' },
+        'Edit': { hi: 'बदलें', en: 'EDIT' },
+        'Delete': { hi: 'हटाएँ', en: 'DELETE' },
+        'SoldOn': { hi: 'बिका', en: 'Sold on' },
+        'SoldAt': { hi: 'बिक्री मूल्य', en: 'Sold at' },
+        'ViewDetail': { hi: 'विवरण देखें', en: 'VIEW DETAIL' },
+        'MyOrders': { hi: 'मेरे ऑर्डर', en: 'My Orders' },
+        'OrderPlaced': { hi: 'ऑर्डर हुआ', en: 'Order Placed' },
+        'PackagingDone': { hi: 'पैकेजिंग पूरी', en: 'Packaging Done' },
+        'ShipmentDone': { hi: 'शिपमेंट हुई', en: 'Shipment Done' },
+        'OutForDelivery': { hi: 'वितरण के लिए निकला', en: 'Out for Delivery' },
+        'DeliveryDone': { hi: 'वितरण पूरा', en: 'Delivery Done' },
+        'Summary': { hi: 'सारांश', en: 'SUMMARY' },
+        'ViewBill': { hi: 'बिल देखें', en: 'VIEW BILL' },
+        'AGrade': { hi: 'A ग्रेड (उत्कृष्ट)', en: 'A Grade (Excellent)' },
+        'BGrade': { hi: 'B ग्रेड (अच्छा)', en: 'B Grade (Good)' },
+        'CGrade': { hi: 'C ग्रेड (सामान्य)', en: 'C Grade (Average)' },
+        'Tomato': { hi: 'टमाटर', en: 'Tomato' },
+        'Potato': { hi: 'आलू', en: 'Potato' },
+        'Onion': { hi: 'प्याज', en: 'Onion' },
+        'Capsicum': { hi: 'शिमला मिर्च', en: 'Capsicum' },
+        'Brinjal': { hi: 'बैंगन', en: 'Brinjal' },
+        'Chilli': { hi: 'मिर्च', en: 'Chilli' },
+        'Ginger': { hi: 'अदरक', en: 'अदरक' },
+        'Garlic': { hi: 'लहसुन', en: 'Garlic' },
+        'Cabbage': { hi: 'पत्ता गोभी', en: 'Cabbage' },
+        'Brocolli': { hi: 'ब्रोकोली', en: 'Brocolli' },
+        'Quintals': { hi: 'क्विंटल', en: 'Quintals' },
+        'Tons': { hi: 'टन', en: 'Tons' },
+        'Kg': { hi: 'किलोग्राम', en: 'Kg' },
+        'products listed currently': { hi: 'उत्पाद अभी लिस्ट हैं।', en: 'products listed currently.' },
+        'No active offers yet.': { hi: 'अभी कोई सक्रिय प्रस्ताव नहीं है।', en: 'No active offers yet.' },
+        'Product': { hi: 'उत्पाद', en: 'Product' },
+        'Offer': { hi: 'ऑफर', en: 'Offer' },
+        'MarketPrice': { hi: 'बाज़ार मूल्य', en: 'Market Price' },
+        'Type your message here...': { hi: 'अपना संदेश यहाँ लिखें...', en: 'Type your message here...' },
+        'ViewAll': { hi: 'सभी देखें', en: 'View all' },
+        'TrackOrder': { hi: 'ऑर्डर ट्रैक करें', en: 'Track Order' },
+        'I have rechecked all the details': { hi: 'मैंने सभी विवरण दोबारा जांच लिए हैं हैं।', en: 'I have rechecked all the details' },
+        'DynamicFeedbackBox': { hi: 'अपेक्षित मूल्य दर्ज करें।', en: 'Enter expected price.' },
+        '✅ Your price matches market trends.': { hi: '✅ आपका मूल्य बाज़ार के अनुरूप है।', en: '✅ Your price matches market trends.' },
+        '⚠️ WARNING: Price is about ₹': { hi: '⚠️ चेतावनी: मूल्य बाज़ार औसत से लगभग ₹', en: '⚠️ WARNING: Price is about ₹' },
+        ' higher than average.': { hi: ' अधिक है।', en: ' higher than average.' },
+        '⚠️ WARNING: Price is lower than market average.': { hi: '⚠️ चेतावनी: मूल्य बाज़ार औसत से कम है।', en: '⚠️ WARNING: Price is lower than market average.' },
+        'Market data unavailable.': { hi: 'बाज़ार डेटा अनुपलब्ध है।', en: 'Market data unavailable.' },
+        'Enter expected price.': { hi: 'अपेक्षित मूल्य दर्ज करें।', en: 'Enter expected price.' },
+        'MyProfile': { hi: 'मेरी प्रोफाइल', en: 'My Profile' },
+        'EditProfile': { hi: 'प्रोफाइल बदलें', en: 'Edit Profile' },
+        'FindDealer': { hi: 'डीलर्स खोजें', en: 'Find Dealer' },
+        'FindSeller': { hi: 'विक्रेता खोजें', en: 'Find Seller' },
+        'KisanSetuWallet': { hi: 'किसानसेतु वॉलेट', en: 'Kisan Setu Wallet' },
+        'MyStorage': { hi: 'मेरा भंडारण', en: 'My Storage' },
+        'TransactionHistory': { hi: 'लेनदेन इतिहास', en: 'Transaction History' },
+        'FindTransportation': { hi: 'परिवहन खोजें', en: 'Find Transportation' },
+        'ContactExpert': { hi: 'विशेषज्ञ से संपर्क करें', en: 'Contact Expert' },
+        'CropSuggestions': { hi: 'फसल सुझाव', en: 'Crop Suggestions' },
+        'NeedHelp': { hi: 'सहायता चाहिए?', en: 'Need Help?' },
+        'ContactUs': { hi: 'हमसे संपर्क करें', en: 'Contact Us' },
+        'Logout': { hi: 'लॉगआउट', en: 'Logout' },
+        'Notifications': { hi: 'सूचनाएं', en: 'Notifications' },
+        'Menu': { hi: 'मेन्यू', en: 'Menu' },
+        'feature': { hi: 'फीचर', en: 'feature' },
+        'KisanHelp': { hi: 'किसान सहायता', en: 'Kisan Help' },
+        'PastSell': { hi: 'पुरानी बिक्री', en: 'Past Sell' },
+        'OrderTracking': { hi: 'ऑर्डर ट्रैकिंग', en: 'Order Tracking' },
+        'FindStorage': { hi: 'भंडारण खोजें', en: 'Find Storage' },
+        'More Options': { hi: 'अन्य विकल्प', en: 'More Options' },
+        'ConfirmDeleteTitle': { hi: 'लिस्टिंग हटाएँ?', en: 'Delete Listing?' },
+        'ConfirmDeleteMessage': { hi: 'क्या आप वाकई यह लिस्टिंग हटाना चाहते हैं? यह सक्रिय ऑफ़र को भी हटा देगा।', en: 'Are you sure you want to delete this listing? It will also remove active offers.' },
+        'Cancel': { hi: 'रद्द करें', en: 'Cancel' },
+        'DeletePermanently': { hi: 'स्थायी रूप से हटाएँ', en: 'Delete Permanently' },
+        'EditListingTitle': { hi: 'लिस्टिंग बदलें', en: 'Edit Listing' },
+        'Update': { hi: 'अपडेट करें', en: 'Update' },
+    };
+
+    // --- Helper Functions ---
+    // Renamed T to translate to fix 'T' redeclaration error and added safety check for undefined property access
+    const translate = (key) => {
+        if (!langMap[key]) return key;
+        return langMap[key][appData.currentLanguage] || langMap[key]['en'];
+    };
+    
+    const saveToLocalStorage = () => {
+        try {
+            localStorage.setItem('kisanSetuAppData', JSON.stringify(appData));
+        } catch (e) {
+            console.error('Error saving data to localStorage', e);
+        }
+    };
+
+    const loadData = () => {
+        try {
+            const storedData = localStorage.getItem('kisanSetuAppData');
+            if (storedData) {
+                const loadedData = JSON.parse(storedData);
+                appData.users = loadedData.users || {};
+                appData.listings = loadedData.listings || [];
+                appData.offers = loadedData.offers || [];
+                appData.currentLanguage = loadedData.currentLanguage || 'hi'; 
+                
+                const lastUser = localStorage.getItem('kisanSetuCurrentUser');
+                if (lastUser && appData.users[lastUser]) {
+                    appData.currentUser = appData.users[lastUser]; // Use the loaded data in appData.users
+                    return 'dashboard';
+                }
+            }
+            return 'login';
+        } catch (e) {
+            console.warn('No valid stored data found, starting fresh.');
+            return 'login';
+        }
+    };
+    
+    function logoutUser() {
+        // Clear current user session
+        appData.currentUser = null;
+        localStorage.removeItem('kisanSetuCurrentUser');
+        alert(translate('Logged out successfully!'));
+        navigate('login'); // Send back to login screen
+    }
+
+    // --- Confirmation Modal Handlers ---
+    function showConfirmation(titleKey, messageKey, confirmTextKey, confirmAction, id) {
+        document.getElementById('modal-title').textContent = translate(titleKey);
+        document.getElementById('modal-message').textContent = translate(messageKey);
+        document.getElementById('modal-cancel').textContent = translate('Cancel');
+        document.getElementById('modal-confirm').textContent = translate(confirmTextKey);
+        
+        // Remove previous listeners
+        document.getElementById('modal-confirm').onclick = null;
+        document.getElementById('modal-cancel').onclick = hideConfirmation;
+        
+        // Set new confirmation action
+        document.getElementById('modal-confirm').onclick = () => {
+            confirmAction(id);
+            hideConfirmation();
+        };
+
+        document.getElementById('confirmation-modal').classList.remove('hidden');
+        document.getElementById('confirmation-modal').classList.add('flex');
+    }
+
+    function hideConfirmation() {
+        document.getElementById('confirmation-modal').classList.remove('flex');
+        document.getElementById('confirmation-modal').classList.add('hidden');
+    }
+
+    // --- Core Navigation and Logic Handlers ---
+
+    function navigate(screenName, data = {}) {
+        appData.currentScreen = screenName;
+        renderScreen(data);
+    }
+
+    function toggleLanguage() {
+        appData.currentLanguage = appData.currentLanguage === 'hi' ? 'en' : 'hi';
+        saveToLocalStorage();
+        renderScreen(); // Re-render current screen with new language
+    }
+    
+    function generateNewOTP() {
+        // Generates a 6-digit random OTP
+        return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function checkLogin() {
+        const phone = document.getElementById('login-phone').value;
+        const role = document.getElementById('login-role').value;
+        const otp = document.getElementById('login-otp').value;
+
+        // In a real app, OTP would be verified via an API
+        if (otp !== '080604') {
+             alert(translate('Incorrect OTP. Use confirmation code: 080604'));
+             return;
+        }
+
+        const userId = phone + '-' + role;
+        if (appData.users[userId]) {
+            appData.currentUser = appData.users[userId];
+            localStorage.setItem('kisanSetuCurrentUser', userId);
+            navigate('dashboard');
+        } else {
+            alert(translate('Account does not exist. Please register.'));
+        }
+    }
+
+    function startRegistration() {
+        const newOTP = generateNewOTP();
+        // Notify user of the OTP for registration
+        alert(translate('Your one-time registration OTP is: ') + newOTP);
+        
+        // Store the dynamic OTP temporarily for validation
+        localStorage.setItem('regOTP', newOTP);
+        
+        navigate('register');
+    }
+
+    function submitRegistration() {
+        const phone = document.getElementById('reg-phone').value;
+        const name = document.getElementById('reg-name').value;
+        const address = document.getElementById('reg-address').value;
+        const role = document.getElementById('reg-role').value;
+        const submittedOTP = document.getElementById('reg-otp').value;
+        const correctOTP = localStorage.getItem('regOTP');
+
+
+        if (submittedOTP !== correctOTP) {
+             alert(translate('Incorrect OTP. Please check the code sent to your phone.'));
+             return;
+        }
+
+        if (!phone || !name || !role) {
+            alert(translate('Please fill all required fields.'));
+            return;
+        }
+        
+        // CRITICAL FIX: Ensure new users start with EMPTY listings and offers
+        appData.currentUser = {
+            id: phone + '-' + role,
+            phone,
+            name,
+            address,
+            role,
+            isProfileSetup: false,
+            primaryCrop: 'Tomato', 
+            region: 'Pune, MH',
+            // Listings and offers will be derived from the global arrays filtered by ID.
+        };
+        appData.users[appData.currentUser.id] = appData.currentUser;
+        saveToLocalStorage();
+
+        localStorage.removeItem('regOTP'); // Clear OTP after use
+
+        if (role === 'farmer') {
+            navigate('farmerProfileSetup');
+        } else {
+            // For Buyer, skip to dashboard for prototype simplicity
+            navigate('dashboard');
+        }
+    }
+
+    function submitFarmerProfile() {
+        const crop = document.getElementById('farm-crop').value;
+        const region = document.getElementById('farm-region').value;
+        const storage = document.getElementById('farm-storage-yes').checked;
+        const capacity = storage ? document.getElementById('farm-capacity').value : 0;
+        const language = document.getElementById('farm-language').value;
+        
+        if (!crop || !region || !language) {
+            alert(translate('Please select main crop and region.'));
+            return;
+        }
+
+        appData.currentUser.primaryCrop = crop;
+        appData.currentUser.region = region;
+        appData.currentUser.storageAvailable = storage;
+        appData.currentUser.storageCapacity = capacity;
+        appData.currentUser.preferredLanguage = language;
+        appData.currentUser.isProfileSetup = true;
+
+        appData.users[appData.currentUser.id] = appData.currentUser;
+        saveToLocalStorage();
+        navigate('dashboard');
+    }
+    
+    // --- Store Step 1 data globally and proceed to Step 2 ---
+    function collectProductDetails() {
+        const crop = document.getElementById('add-crop').value;
+        const quantity = parseFloat(document.getElementById('add-quantity').value);
+        const unit = document.getElementById('add-unit').value;
+        const grade = document.getElementById('add-grade').value;
+        const date = document.getElementById('add-date').value;
+
+        if (!crop || !quantity || !unit || !grade || !date) {
+             alert(translate('Please fill all product details before proceeding.'));
+             return;
+        }
+        
+        currentListingData = { crop, quantity, unit, grade, date };
+        navigate('addProductPricing'); // Navigate to step 2
+    }
+
+    function calculatePriceFeedback(crop, region, expectedPrice) {
+        const data = mandiData[crop] ? mandiData[crop][region] : null;
+        if (!data) return { message: translate('Market data unavailable.'), color: 'gray-500' };
+
+        const price = parseFloat(expectedPrice);
+        if (isNaN(price)) return { message: translate('Enter expected price.'), color: 'gray-500' };
+
+        if (price >= data.min && price <= data.max + 5) { // Allowing slightly above max for negotiation
+            return { message: translate('✅ Your price matches market trends.'), color: 'green-600' };
+        } else if (price > data.max + 5) {
+             return { message: translate('⚠️ WARNING: Price is about ₹') + (price - data.max).toFixed(0) + translate(' higher than average.'), color: 'red-600' };
+        } else {
+             return { message: translate('⚠️ WARNING: Price is lower than market average.'), color: 'orange-500' };
+        }
+    }
+
+    function listProduct() {
+        const price = parseFloat(document.getElementById('add-price').value);
+        const rechecked = document.getElementById('rechecked-details').checked;
+        
+        // Use the globally stored data from Step 1
+        const { crop, quantity, unit, grade, date } = currentListingData;
+
+        if (!price || !rechecked || !crop) {
+            alert(translate('Please enter price and confirm details.'));
+            return;
+        }
+
+        const newListing = {
+            id: Date.now(),
+            farmerId: appData.currentUser.id, // Associate listing with current user
+            crop: crop,
+            quantity: quantity,
+            unit: unit,
+            price: price,
+            grade: grade,
+            date: date,
+            status: 'Active', // Default status
+            offers: []
+        };
+        appData.listings.push(newListing);
+        saveToLocalStorage();
+        
+        // Simulating a new offer for demo purposes
+        if (newListing.crop === 'Tomato' && newListing.farmerId === appData.currentUser.id) {
+            appData.offers.push({
+                listingId: newListing.id,
+                buyer: simulatedBuyers[0],
+                offerPrice: newListing.price - 2,
+                offerId: Date.now() + 1
+            });
+            saveToLocalStorage();
+        }
+        
+        // Clear temp data
+        currentListingData = {}; 
+
+        navigate('listedSuccessfully');
+    }
+
+    // --- LISTING MANAGEMENT FUNCTIONS (New Feature) ---
+    
+    function confirmDeleteListing(id) {
+        showConfirmation(
+            'ConfirmDeleteTitle', 
+            'ConfirmDeleteMessage', 
+            'DeletePermanently', 
+            deleteListing, 
+            id
+        );
+    }
+
+    function deleteListing(id) {
+        appData.listings = appData.listings.filter(l => l.id !== id);
+        appData.offers = appData.offers.filter(o => o.listingId !== id); // Also delete associated offers
+        saveToLocalStorage();
+        navigate('myListingsActive');
+    }
+    
+    function renderEditListing(id) {
+        const listing = appData.listings.find(l => l.id === id);
+        if (!listing) return navigate('myListingsActive');
+        
+        const regions = Object.keys(mandiData.Tomato); // Using Tomato as a base for regions
+        const priceData = getMandiPrice(listing.crop, listing.region || appData.currentUser.region);
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="font-semibold text-gray-600" onclick="navigate('myListingsActive')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('EditListingTitle')}</h2>
+                    <span class="w-10"></span>
+                </div>
+
+                <div class="p-6 flex-grow overflow-y-auto">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">${translate('Product')}: ${translate(listing.crop)}</h3>
+                    
+                    <!-- Editable Fields -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('Quantity')}</span>
+                        <input type="number" id="edit-quantity" value="${listing.quantity}">
+                    </div>
+                    
+                    <div class="input-group">
+                        <span class="input-label">${translate('Unit')}</span>
+                        <select id="edit-unit" class="p-2">
+                            ${['Quintals', 'Tons', 'Kg'].map(u => `<option value="${u}" ${listing.unit === u ? 'selected' : ''}>${translate(u)}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-label">${translate('Grade')}</span>
+                        <select id="edit-grade" class="p-2">
+                            ${['A', 'B', 'C'].map(g => `<option value="${g}" ${listing.grade === g ? 'selected' : ''}>${translate(g + 'Grade')}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <!-- Price Section -->
+                    <div class="mt-4 mb-4">
+                        <p class="text-sm font-medium text-gray-700">${translate('MarketRange')}: <span class="text-red-600 font-bold">₹${priceData.min}-${priceData.max} / ${priceData.unit}</span></p>
+                        <div class="input-group mt-2">
+                            <span class="input-label">${translate('ExpectedPrice')}</span>
+                            <input type="number" id="edit-price" value="${listing.price}">
+                        </div>
+                    </div>
+
+                    <button class="btn-primary w-full mt-4" onclick="updateListing(${id})">${translate('Update')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateListing(id) {
+        const listingIndex = appData.listings.findIndex(l => l.id === id);
+        
+        if (listingIndex !== -1) {
+            appData.listings[listingIndex].quantity = parseFloat(document.getElementById('edit-quantity').value);
+            appData.listings[listingIndex].unit = document.getElementById('edit-unit').value;
+            appData.listings[listingIndex].grade = document.getElementById('edit-grade').value;
+            appData.listings[listingIndex].price = parseFloat(document.getElementById('edit-price').value);
+            
+            saveToLocalStorage();
+            navigate('myListingsActive');
+        }
+    }
+
+    // --- Order and Tracking Functions ---
+    function startNegotiation(offerId) {
+        const offer = appData.offers.find(o => o.offerId === offerId);
+        if (offer) {
+            navigate('negotiate', { offer: offer });
+        }
+    }
+
+    function acceptDeal(offerId) {
+        const offer = appData.offers.find(o => o.offerId === offerId);
+        const listing = appData.listings.find(l => l.id === offer.listingId);
+        
+        if (offer && listing) {
+            listing.status = 'Sold';
+            listing.soldAtPrice = offer.offerPrice;
+            listing.buyerId = offer.buyer.id;
+            listing.soldDate = new Date().toLocaleDateString('en-GB'); // Current date logic
+
+            // Remove the offer from active offers
+            appData.offers = appData.offers.filter(o => o.offerId !== offerId);
+            saveToLocalStorage();
+            alert(translate('Deal confirmed successfully at ₹') + offer.offerPrice + '!');
+            navigate('myListingsSold'); // Navigate to sold list
+        }
+    }
+    
+    // --- Utility Functions ---
+    function getMandiPrice(crop, region) {
+        if (mandiData[crop] && mandiData[crop][region]) {
+            return mandiData[crop][region];
+        }
+        return { min: 10, max: 35, unit: 'Kg', trend: 'stable' };
+    }
+    
+    // ----------------------------------------------------------------------
+    // --- RENDER FUNCTIONS START HERE ---
+    // ----------------------------------------------------------------------
+    
+    function renderLogin() {
+        // ... (Login rendering code is omitted for brevity)
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="text-center pt-8">
+                    ${getLogoHtml()}
+                    <h2 class="text-2xl font-semibold mb-6">${translate('Login')}:</h2>
+                </div>
+
+                <div class="px-6 flex flex-col justify-center flex-grow">
+                    <!-- Mob. No. & Send OTP -->
+                    <div class="input-group login-input-group">
+                        <span class="input-label">${translate('MobNo')}</span>
+                        <input type="number" id="login-phone" placeholder="+91 90XXXXXX" value="9060214219" class="border-l border-gray-300">
+                        <button class="bg-gray-300 text-sm p-2 font-medium h-full" onclick="alert('${translate('SendOTP')} - 080604')">${translate('SendOTP')}</button>
+                    </div>
+
+                    <!-- OTP & Validate -->
+                    <div class="input-group login-input-group">
+                        <span class="input-label">OTP</span>
+                        <input type="text" id="login-otp" placeholder="080604" value="080604" class="border-l border-gray-300">
+                        <button class="bg-gray-300 text-sm p-2 font-medium h-full" onclick="checkLogin()">${translate('Validate')}</button>
+                    </div>
+                    
+                    <!-- Role Selection -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('WhoAreYou')}</span>
+                        <select id="login-role" class="p-2">
+                            <option value="farmer">${translate('Farmer')}</option>
+                            <option value="buyer">${translate('Buyer')}</option>
+                        </select>
+                    </div>
+
+                    <!-- Login Button -->
+                    <button class="bg-gray-400 text-white font-semibold py-3 rounded-lg mb-4" onclick="checkLogin()">${translate('Login')}</button>
+
+                    <!-- Register Button (Ditto separate style) -->
+                    <button class="btn-primary w-full mt-2 mb-8" onclick="startRegistration()">${translate('Register')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderRegister() {
+        // ... (Register rendering code is omitted for brevity)
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="text-center pt-8">
+                    ${getLogoHtml()}
+                    <h2 class="text-2xl font-semibold mb-6">${translate('Register')}:</h2>
+                </div>
+
+                <div class="px-6 flex flex-col justify-center flex-grow">
+                    <!-- Name -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('FullName')}</span>
+                        <input type="text" id="reg-name" placeholder="Raghav Anand" value="Raghav Anand">
+                    </div>
+                    
+                    <!-- Phone & Send OTP (FIXED UI) -->
+                    <div class="input-group mb-4" style="padding: 0;">
+                        <span class="input-label">${translate('MobNo')}</span>
+                        <input type="number" id="reg-phone" placeholder="+91 90XXXXXX" value="9060214219" style="padding:0.75rem 0.5rem; border:none; width:45%;">
+                        <button class="bg-gray-300 text-sm p-2 font-medium" style="width:25%; border-radius:0;" onclick="alert('${translate('SendOTP')} - ' + localStorage.getItem('regOTP'))">${translate('SendOTP')}</button>
+                    </div>
+                    
+                    <!-- OTP -->
+                    <div class="input-group">
+                        <span class="input-label">OTP</span>
+                        <input type="text" id="reg-otp" placeholder="Enter OTP">
+                        <button class="bg-gray-300 text-sm p-2 font-medium" onclick="alert('${translate('Validate')}')">${translate('Validate')}</button>
+                    </div>
+
+                    <!-- Address -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('Address')}</span>
+                        <input type="text" id="reg-address" placeholder="Village, District, State" value="Pune, Maharashtra">
+                    </div>
+                    
+                    <!-- Role Selection -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('WhoAreYou')}</span>
+                        <select id="reg-role" class="p-2">
+                            <option value="farmer">${translate('Farmer')}</option>
+                            <option value="buyer">${translate('Buyer')}</option>
+                        </select>
+                    </div>
+                    
+                    <button class="btn-primary w-full mt-4 mb-8" onclick="submitRegistration()">${translate('Register')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderFarmerProfileSetup() {
+        // ... (Profile Setup rendering code is omitted for brevity)
+        const regions = Object.keys(mandiData.Tomato); // Using Tomato as a base for regions
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="font-semibold text-gray-600" onclick="navigate('register')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <span class="text-lg font-semibold">${translate('ProfileSetup')}</span>
+                </div>
+                
+                <div class="px-6 py-4 flex flex-col flex-grow overflow-y-auto">
+                    ${getLogoHtml()}
+                    <h2 class="text-2xl font-semibold mb-4">${translate('ProfileSetup')}:</h2>
+                    
+                    <!-- Land Area -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('LandArea')}</span>
+                        <input type="number" placeholder="Enter Land Area(Acres)..." value="5">
+                    </div>
+                    
+                    <!-- Primary Crop -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('PrimaryCrop')}</span>
+                        <select id="farm-crop" class="p-2">
+                            ${Object.keys(mandiData).map(crop => `<option value="${crop}">${translate(crop) || crop}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <!-- Region/District -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('Region')}</span>
+                        <select id="farm-region" class="p-2">
+                            ${regions.map(region => `<option value="${region}">${region}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <!-- Storage Availability -->
+                    <div class="flex items-center mb-4 p-2 border border-gray-200 rounded-lg">
+                        <span class="mr-4 font-medium">${translate('StorageAvailable')}</span>
+                        <input type="checkbox" id="farm-storage-yes" name="storage" value="yes" class="mr-2">
+                        <label for="farm-storage-yes" class="mr-4">${translate('Yes')}</label>
+                        <input type="checkbox" id="farm-storage-no" name="storage" value="no" class="mr-2">
+                        <label for="farm-storage-no">${translate('No')}</label>
+                    </div>
+                    
+                    <!-- Storage Capacity (Visible only if Yes is checked) -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('StorageCapacity')}</span>
+                        <input type="number" id="farm-capacity" placeholder="Enter Capacity (in Quintals)" value="100">
+                    </div>
+                    
+                    <!-- Preferred Language -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('PreferredLanguage')}</span>
+                        <select id="farm-language" class="p-2">
+                            <option value="hi">${translate('Hindi') || 'Hindi'}</option>
+                            <option value="en">${translate('English') || 'English'}</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-primary w-full mt-6 mb-8" onclick="submitFarmerProfile()">${translate('SaveGoDashboard')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderDashboard() {
+        if (!appData.currentUser) return navigate('login');
+        
+        const crop = appData.currentUser.primaryCrop;
+        const region = appData.currentUser.region;
+        
+        // Prepare Benchmark List Data
+        const benchmarkListHtml = Object.keys(mandiData).map(listCrop => {
+            const currentRegion = appData.currentUser.region || 'Pune, MH';
+            // Robustly get data or use fallback
+            const data = mandiData[listCrop][currentRegion] || mandiData[listCrop][Object.keys(mandiData[listCrop])[0]] || { min: 0, max: 0, unit: 'Kg', trend: 'stable' };
+            
+            const trendIcon = data.trend === 'up' ? '↑' : data.trend === 'down' ? '↓' : '—';
+            const trendColor = data.trend === 'up' ? 'text-green-500' : data.trend === 'down' ? 'text-red-500' : 'text-gray-500';
+            const marketIcon = `
+                <svg class="w-4 h-4 text-yellow-700 ml-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M6 16.32a.7.7 0 1 1-.7-.7.7.7 0 0 1 .7.7z"/>
+                    <path d="M18 16.32a.7.7 0 1 1-.7-.7.7.7 0 0 1 .7.7z"/>
+                    <path d="M21 5H3v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V5z"/>
+                    <path d="M6 5v14"/>
+                    <path d="M18 5v14"/>
+                    <path d="M6 12h12"/>
+                </svg>`;
+
+            return `
+                <div class="grid grid-cols-5 py-2 text-sm">
+                    <div class="col-span-2 font-medium">${translate(listCrop) || listCrop}</div>
+                    <div class="col-span-2 font-semibold text-center">
+                        ₹${data.min}-${data.max}
+                        <span class="${trendColor} ml-1">${trendIcon}</span>
+                    </div>
+                    <div class="col-span-1 flex justify-end">${marketIcon}</div>
+                </div>
+            `;
+        }).join('');
+        
+        // Horizontal Scrollable Menu Items (Colors are ditto from the design)
+        
+        // Scrollable menu rendering for the dashboard
+        const scrollableMenu = `
+            <div class="scroll-menu-container">
+                <div class="scroll-arrow" onclick="scrollHorizontalMenu(-1)">
+                    <span class="text-sm">&lt;</span>
+                </div>
+                <div id="horizontal-menu" class="scroll-menu">
+                    <button class="scroll-item bg-pink-300 text-gray-800" onclick="navigate('activeOffers')">${translate('ActiveOffers')}</button>
+                    <button class="scroll-item bg-orange-400 text-gray-800" onclick="navigate('myListingsActive')">${translate('MyListings')}</button>
+                    <button class="scroll-item bg-lime-500 text-white" onclick="alert('${translate('KisanHelp')} ${translate('feature')}')">${translate('KisanHelp')}</button>
+                    <button class="scroll-item bg-purple-500 text-white" onclick="navigate('myListingsSold')">${translate('PastSell')}</button>
+                    <button class="scroll-item bg-red-500 text-white" onclick="navigate('trackOrder')">${translate('OrderTracking')}</button>
+                    <button class="scroll-item bg-yellow-500 text-white" onclick="alert('${translate('FindStorage')} ${translate('feature')}')">${translate('FindStorage')}</button>
+                </div>
+                <div class="scroll-arrow" onclick="scrollHorizontalMenu(1)">
+                    <span class="text-sm">&gt;</span>
+                </div>
+            </div>
+        `;
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <!-- TOP HEADER DITTO -->
+                <div class="header">
+                    ${getLogoHtml(true)}
+                    <div class="flex items-center space-x-4">
+                        <svg onclick="navigate('notifications')" class="w-6 h-6 text-gray-700 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 1 1 1-3.46 0"/></svg>
+                        <svg onclick="navigate('menu')" class="w-6 h-6 text-gray-700 cursor-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                    </div>
+                </div>
+
+                <div class="p-4 flex-grow overflow-y-auto">
+                    <h1 class="dashboard-header text-gray-800">${translate('Dashboard')}</h1>
+                    <h2 class="welcome-text text-gray-800">${translate('Welcome')}, ${appData.currentUser.name}!</h2>
+
+                    <!-- Primary Action Button (Add New Product) - DITTO GREEN -->
+                    <button class="bg-lime-500 hover:bg-lime-600 text-white font-bold py-3 px-4 rounded-lg w-full mb-6 shadow-md" onclick="navigate('addProduct')">
+                        ${translate('AddNewProduct')}
+                    </button>
+
+                    <!-- USP Card: Price Benchmark - DITTO YELLOW/GREEN BORDER -->
+                    <div class="usp-card-ditto mb-6 shadow-lg">
+                        <h3 class="text-lg font-bold mb-3 text-red-600">${translate('TodayMarketBenchmark')}</h3>
+                        <p class="text-sm text-gray-600 mb-3">(${translate('Region')}: ${appData.currentUser.region})</p>
+                        <div class="bg-yellow-100 p-1 border-t border-b border-yellow-300">
+                            ${benchmarkListHtml}
+                        </div>
+                        <p class="text-right text-xs text-blue-600 mt-2 cursor-pointer" onclick="alert('${translate('ViewAll')} ${translate('TodayMarketBenchmark')}')">${translate('ViewAll')}...</p>
+                    </div>
+
+                    <!-- Horizontal Scrollable Menu (The Missing Part) -->
+                    <h3 class="text-lg font-semibold mb-2">${translate('More Options')}</h3>
+                    ${scrollableMenu}
+                    
+                    <!-- Placeholder for Active Listings/Offers Summary -->
+                    <div class="mt-4 p-4 border border-gray-200 rounded-lg">
+                        <h4 class="font-semibold text-gray-700">${translate('TotalOffers')}: <span class="text-red-600">${appData.offers.length}</span></h4>
+                        <p class="text-sm text-gray-500">
+                           ${appData.listings.filter(l => l.farmerId === appData.currentUser.id).length} ${translate('products listed currently')}.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderAddProduct(step = 1) {
+        // ... (Add Product step 1 rendering code is omitted for brevity)
+        if (step === 1) {
+            document.getElementById('app-content').innerHTML = `
+                <div class="flex flex-col h-full">
+                    <div class="header">
+                        <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                            <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                        </button>
+                        <span class="text-lg font-semibold">${translate('AddProduct')}</span>
+                    </div>
+
+                    <div class="p-6 flex-grow overflow-y-auto">
+                        <h2 class="text-2xl font-semibold mb-6 text-red-600">${translate('AddProduct')}</h2>
+                        
+                        <!-- Crop Name -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('PrimaryCrop')}</span>
+                            <select id="add-crop" class="p-2">
+                                ${Object.keys(mandiData).map(crop => `<option value="${crop}">${translate(crop) || crop}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('Quantity')}</span>
+                            <input type="number" id="add-quantity" placeholder="Quantity..." value="15">
+                        </div>
+
+                        <!-- Unit -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('Unit')}</span>
+                            <select id="add-unit" class="p-2">
+                                <option value="Quintals">${translate('Quintals') || 'Quintals'}</option>
+                                <option value="Tons">${translate('Tons') || 'Tons'}</option>
+                                <option value="Kg">${translate('Kg') || 'Kg'}</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Quality Grade -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('Grade')}</span>
+                            <select id="add-grade" class="p-2">
+                                <option value="A">${translate('AGrade') || 'A Grade (उत्कृष्ट)'}</option>
+                                <option value="B">${translate('BGrade') || 'B Grade (अच्छा)'}</option>
+                                <option value="C">${translate('CGrade') || 'C Grade (सामान्य)'}</option>
+                            </select>
+                        </div>
+
+                        <!-- Availability Date -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('AvailabilityDate')}</span>
+                            <input type="text" id="add-date" placeholder="DD-MM-YYYY" value="25-10-2025">
+                        </div>
+
+                        <!-- Product Photo Placeholder -->
+                        <div class="border border-dashed border-gray-400 p-8 text-center rounded-lg mb-6">
+                            <p class="text-gray-500">${translate('ProductPhoto')}: Add Upto 4 Photos</p>
+                            <svg class="w-10 h-10 mx-auto text-gray-400 mt-2" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+                        </div>
+
+                        <button class="bg-blue-500 text-white font-semibold py-3 rounded-lg w-full" onclick="collectProductDetails()">${translate('Next')}</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // STEP 2: PRICING SCREEN with Dynamic Feedback
+            const currentCrop = currentListingData.crop;
+            const region = appData.currentUser.region || 'Pune, MH';
+            const priceData = getMandiPrice(currentCrop, region);
+            const mandiRangeText = `₹${priceData.min}-${priceData.max} / ${priceData.unit}`;
+            
+            // Functionality for dynamic feedback is in the script tag below
+            document.getElementById('app-content').innerHTML = `
+                <div class="flex flex-col h-full">
+                    <div class="header">
+                        <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('addProduct')">
+                            <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                        </button>
+                        <span class="text-lg font-semibold">${translate('Pricing')}</span>
+                    </div>
+
+                    <div class="p-6 flex-grow overflow-y-auto">
+                        <h2 class="text-2xl font-semibold mb-6 text-red-600">${translate('Pricing')}</h2>
+
+                        <!-- Market Range Display (USP) -->
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-700">${translate('MarketRange')}:</p>
+                            <h3 class="text-xl font-bold text-red-600">${mandiRangeText}</h3>
+                        </div>
+
+                        <!-- Expected Price Input -->
+                        <div class="input-group border-red-500">
+                            <span class="input-label">${translate('ExpectedPrice')}</span>
+                            <input type="number" id="add-price" placeholder="Enter Price per ${priceData.unit}..." oninput="updatePriceFeedback('${currentCrop}', '${region}')" value="">
+                        </div>
+
+                        <!-- Dynamic Feedback Box -->
+                        <div id="price-feedback" class="p-3 mb-6 rounded-lg text-sm font-semibold border-2 border-gray-300 text-gray-600">
+                            ${translate('DynamicFeedbackBox')}
+                        </div>
+
+                        <!-- Confirmation Checkbox -->
+                        <div class="flex items-center mb-6">
+                            <input type="checkbox" id="rechecked-details" class="mr-2">
+                            <label for="rechecked-details" class="text-sm">${translate('I have rechecked all the details') || 'I have rechecked all the details'}</label>
+                        </div>
+
+                        <!-- Action Buttons - DITTO COLORS -->
+                        <div class="flex justify-between space-x-4">
+                            <button class="bg-yellow-300 text-gray-800 font-semibold py-3 rounded-lg w-1/2" onclick="navigate('addProduct')">${translate('Previous')}</button>
+                            <button class="bg-lime-500 text-white font-semibold py-3 rounded-lg w-1/2" onclick="listProduct()">
+                                ${translate('ListInMarket')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Trigger initial feedback update
+            document.getElementById('add-price').value = priceData.max + 2; // Example starting price
+            updatePriceFeedback(currentCrop, region);
+        }
+    }
+
+    function renderListedSuccessfully() {
+        // ... (Listed Successfully rendering code is omitted for brevity)
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full items-center justify-center p-6 text-center">
+                <div class="mb-10">
+                    <svg class="w-32 h-32 text-green-500 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <h2 class="text-xl font-semibold mt-4 text-green-700">${translate('ListedSuccessfully')}</h2>
+                </div>
+                
+                <p class="text-gray-600 mb-8">${translate('Your product is now visible to buyers.') || 'Your product is now visible to buyers.'}</p>
+                
+                <button class="btn-primary w-full max-w-xs" onclick="navigate('dashboard')">${translate('Dashboard')}</button>
+                <button class="text-sm text-blue-500 mt-4" onclick="navigate('myListingsActive')">${translate('ViewAll')} ${translate('MyListings')}</button>
+            </div>
+        `;
+    }
+
+    function renderActiveOffers() {
+        // ... (Active Offers rendering code is omitted for brevity)
+        const activeListingsIds = appData.listings.filter(l => l.farmerId === appData.currentUser.id).map(l => l.id);
+        const offersHtml = appData.offers.filter(o => activeListingsIds.includes(o.listingId)).map(offer => {
+            const listing = appData.listings.find(l => l.id === offer.listingId);
+            if (!listing) return ''; // Safety check for offers without associated listing
+            
+            const region = appData.currentUser.region || 'Pune, MH';
+            const priceData = getMandiPrice(listing.crop, region);
+
+            return `
+                <div class="bg-white p-4 rounded-xl shadow-md mb-4 flex items-center border border-red-100">
+                    <div class="flex items-center mb-3">
+                        <div class="mr-4">
+                             <!-- Image of Tomato -->
+                            <svg class="w-12 h-12" viewBox="0 0 24 24" fill="#EF4444" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="#EF4444"/><path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" fill="#B91C1C"/></svg>
+                        </div>
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-center">
+                                <h3 class="text-lg font-bold">${translate(listing.crop) || listing.crop} <span class="text-sm font-normal">(${listing.quantity} ${translate(listing.unit) || listing.unit})</span></h3>
+                                <span class="font-bold text-red-600">₹${offer.offerPrice} / ${priceData.unit}</span>
+                            </div>
+                            <p class="text-xs text-gray-600">${translate('MarketPrice')}: ₹${priceData.min}-${priceData.max}</p>
+                            <p class="text-sm font-medium text-gray-800 mt-1">${offer.buyer.name} <span class="text-yellow-500 ml-1">★${offer.buyer.rating}</span></p>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-between space-x-4">
+                        <button class="bg-lime-500 hover:bg-lime-600 text-white font-bold py-2 rounded-lg w-1/2" onclick="acceptDeal(${offer.offerId})">${translate('Accept')}</button>
+                        <button class="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 rounded-lg w-1/2" onclick="startNegotiation(${offer.offerId})">${translate('NegotiateBtn')}</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold text-red-600">${translate('ActiveOffers')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                
+                <div class="p-4 flex-grow overflow-y-auto">
+                    ${offersHtml.length ? offersHtml : `<p class="text-center text-gray-500 mt-10">${translate('No active offers yet.')}</p>`}
+                </div>
+            </div>
+        `;
+    }
+
+    function renderNegotiate(data) {
+        // ... (Negotiate rendering code is omitted for brevity)
+        let offer = data.offer;
+        let listing;
+        let buyerName;
+        let isDirectChat = false;
+
+        if (offer && offer.listingId) {
+            // Case 1: Negotiate from Active Offers
+            listing = appData.listings.find(l => l.id === offer.listingId);
+            buyerName = offer.buyer.name;
+        } else if (data.dealer) {
+            // Case 2: Direct Chat from Find Dealer
+            isDirectChat = true;
+            // Use the first active listing as a placeholder product being discussed
+            listing = appData.listings.find(l => l.status === 'Active' && l.farmerId === appData.currentUser.id);
+            
+            if (!listing) {
+                alert(translate('Cannot start chat without an active listing. Please add a product first.'));
+                return navigate('dashboard');
+            }
+            
+            // Create a simulated offer object for the UI rendering logic
+            buyerName = data.dealer;
+            const buyerObj = simulatedBuyers.find(b => b.name === data.dealer) || { name: data.dealer, rating: 4.0 };
+            
+            offer = {
+                listingId: listing.id,
+                buyer: buyerObj,
+                offerPrice: listing.price - 2, // A dummy offer slightly lower than list price
+                offerId: Date.now() 
+            };
+        } else {
+             return navigate('dashboard');
+        }
+
+
+        // Safety check for listing existence (required for price data)
+        if (!listing) return navigate('dashboard'); 
+        
+        const region = appData.users[listing.farmerId].region || 'Pune, MH';
+        const priceData = getMandiPrice(listing.crop, region);
+        
+        // Determine action buttons based on context
+        const actionButtons = isDirectChat ? 
+            `
+            <button class="bg-blue-500 text-white font-bold py-1 px-3 rounded text-sm">${translate('New Offer')}</button>
+            <button class="bg-gray-400 text-white font-bold py-1 px-3 rounded text-sm" onclick="navigate('findDealer')">${translate('Back')}</button>
+            `
+            :
+            `
+            <button class="bg-green-500 text-white font-bold py-1 px-3 rounded text-sm" onclick="acceptDeal(${offer.offerId})">${translate('AcceptDeal')}</button>
+            <button class="bg-red-500 text-white font-bold py-1 px-3 rounded text-sm" onclick="navigate('activeOffers')">${translate('CancelDeal')}</button>
+            `;
+
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header border-b border-gray-300">
+                    <button class="font-semibold text-gray-600" onclick="navigate('activeOffers')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('Negotiate')}</h2>
+                    <span class="w-10"></span>
+                </div>
+
+                <!-- Pinned Negotiation Info (USP Integration) -->
+                <div class="bg-gray-100 p-3 border-b border-gray-300">
+                    <div class="flex items-start justify-between mb-2">
+                        <div class="flex items-center">
+                            <svg class="w-8 h-8 mr-2 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
+                            <h3 class="font-semibold text-gray-800">${buyerName} <span class="text-yellow-500 ml-1">★${offer.buyer.rating}</span></h3>
+                        </div>
+                        <div class="flex space-x-2">
+                             ${actionButtons}
+                        </div>
+                    </div>
+
+                    <div class="p-2 bg-white rounded-lg border border-gray-200 text-sm">
+                        <p class="font-medium text-gray-800">${translate('Product')}: ${translate(listing.crop) || listing.crop} (${listing.quantity} ${translate(listing.unit) || listing.unit})</p>
+                        <p class="text-sm text-red-600 font-bold mt-1">
+                            ${translate('Offer')}: ₹${offer.offerPrice} / ${priceData.unit} | 
+                            ${translate('MarketPrice')}: ₹${priceData.min}-${priceData.max}
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Chat Area (Simulated) -->
+                <div id="chat-messages" class="p-4 flex flex-col flex-grow overflow-y-auto">
+                    <!-- Example Chat Messages -->
+                    <div class="chat-bubble chat-buyer self-start">Hi, I can offer ₹${offer.offerPrice} for this lot.</div>
+                    <div class="chat-bubble chat-farmer self-end">Market is good, I need ₹${priceData.max}. Can you match that?</div>
+                </div>
+
+                <!-- Input Box -->
+                <div class="p-4 border-t border-gray-300 flex space-x-2">
+                    <input type="text" placeholder="${translate('TypeMessage')}" class="flex-grow p-2 border rounded-full">
+                    <button class="bg-blue-500 text-white p-2 rounded-full">
+                         <svg class="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMyListingsActive() {
+        // ... (My Listings Active rendering code is omitted for brevity)
+        const activeListingsHtml = appData.listings.filter(l => l.status === 'Active' && l.farmerId === appData.currentUser.id).map(l => {
+            const region = appData.currentUser.region || 'Pune, MH';
+            const priceData = getMandiPrice(l.crop, region);
+
+            return `
+                <div class="bg-white p-4 rounded-xl shadow-md mb-4 flex items-center border border-green-100">
+                    <div class="mr-4">
+                        <!-- Image of Tomato/Potato -->
+                        <svg class="w-16 h-16" viewBox="0 0 24 24" fill="#6EE7B7" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#6EE7B7"/><path d="M12 16.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z" fill="#34D399"/></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-bold">${translate(l.crop) || l.crop} <span class="text-sm font-normal">(${l.quantity} ${translate(l.unit) || translate(l.unit)})</span></h3>
+                        <p class="text-sm text-gray-600">${translate('ListedOn')}: ${l.date || '24-10-2025'}</p>
+                        <p class="text-xs text-red-500 font-semibold">${translate('MarketPrice')}: ₹${priceData.min}-${priceData.max}</p>
+                        <p class="text-sm font-medium mt-1">${translate('TotalOffers')}: <span class="text-blue-600">${appData.offers.filter(o => o.listingId === l.id).length}</span></p>
+                    </div>
+                    
+                    <div class="flex flex-col space-y-2">
+                        <button class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 text-xs font-bold py-1 px-2 rounded" onclick="renderEditListing(${l.id})">${translate('Edit')}</button>
+                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded" onclick="confirmDeleteListing(${l.id})">${translate('Delete')}</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('MyListings')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                
+                <div class="flex justify-around bg-gray-100 p-2 border-b border-gray-200">
+                    <button class="font-bold text-green-600 border-b-2 border-green-600 p-1">${translate('Active')}</button>
+                    <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsSold')">${translate('Sold')}</button>
+                </div>
+
+                <div class="p-4 flex-grow overflow-y-auto">
+                    ${activeListingsHtml.length ? activeListingsHtml : `<p class="text-center text-gray-500 mt-10">${translate('No active listings yet. Add a new product!')}</p>`}
+                </div>
+                
+                <div class="p-4 border-t border-gray-200">
+                    <button class="btn-primary w-full" onclick="navigate('addProduct')">${translate('AddNewProduct')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMyListingsSold() {
+        // ... (My Listings Sold rendering code is omitted for brevity)
+        const soldListingsHtml = appData.listings.filter(l => l.status === 'Sold' && l.farmerId === appData.currentUser.id).map(l => {
+            return `
+                <div class="bg-white p-4 rounded-xl shadow-md mb-4 flex items-center border border-blue-100">
+                    <div class="mr-4">
+                        <!-- Image of Sold Product -->
+                        <svg class="w-16 h-16" viewBox="0 0 24 24" fill="#3B82F6" xmlns="http://www.w3.org/2000/svg"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zM12 20c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z" fill="#3B82F6"/></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-bold">${translate(l.crop) || l.crop} <span class="text-sm font-normal">(${l.quantity} ${translate(l.unit) || translate(l.unit)})</span></h3>
+                        <p class="text-sm text-gray-600">${translate('SoldOn')}: ${l.soldDate || '28-10-2025'}</p>
+                        <p class="text-sm font-medium mt-1 text-green-600">${translate('SoldAt')}: ₹${l.soldAtPrice}</p>
+                    </div>
+                    
+                    <button class="bg-blue-500 hover:bg-blue-600 text-white text-xs font-bold py-2 px-3 rounded" onclick="navigate('trackOrder')">${translate('ViewDetail')}</button>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('MyListings')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                
+                <div class="flex justify-around bg-gray-100 p-2 border-b border-gray-200">
+                    <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsActive')">${translate('Active')}</button>
+                    <button class="font-bold text-blue-600 border-b-2 border-blue-600 p-1">${translate('Sold')}</button>
+                </div>
+
+                <div class="p-4 flex-grow overflow-y-auto">
+                    ${soldListingsHtml.length ? soldListingsHtml : `<p class="text-center text-gray-500 mt-10">${translate('No sold items yet.')}</p>`}
+                </div>
+                
+                <div class="p-4 border-t border-gray-200">
+                    <button class="btn-primary w-full" onclick="navigate('addProduct')">${translate('AddNewProduct')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderTrackOrder() {
+        // ... (Track Order rendering code is omitted for brevity)
+         document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('myListingsSold')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('TrackOrder') || 'Track Order'}</h2>
+                    <span class="w-10"></span>
+                </div>
+                
+                <div class="p-6 flex-grow overflow-y-auto">
+                    <div class="bg-white p-5 rounded-xl shadow-lg border-t-4 border-green-500">
+                        <h3 class="text-lg font-bold mb-4">${translate('Tomato')} (6 ${translate('Quintals')})</h3>
+                        
+                        <!-- Order Timeline (Tracking) -->
+                        <ul class="relative border-l border-gray-300 ml-2 pl-4">
+                            <li class="mb-4">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-green-500 rounded-full -left-3 ring-8 ring-white"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg></span>
+                                <h4 class="font-semibold text-gray-900">${translate('OrderPlaced')}</h4>
+                                <p class="text-sm text-gray-500">${new Date().toLocaleDateString('en-GB')}</p>
+                            </li>
+                            <li class="mb-4">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-green-500 rounded-full -left-3 ring-8 ring-white"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg></span>
+                                <h4 class="font-semibold text-gray-900">${translate('PackagingDone')}</h4>
+                                <p class="text-sm text-gray-500">${new Date(Date.now() + 86400000).toLocaleDateString('en-GB')} (Dummy)</p>
+                            </li>
+                            <li class="mb-4">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-yellow-500 rounded-full -left-3 ring-8 ring-white"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg></span>
+                                <h4 class="font-semibold text-gray-900">${translate('ShipmentDone')}</h4>
+                                <p class="text-sm text-gray-500">${new Date(Date.now() + 86400000 * 2).toLocaleDateString('en-GB')} (Dummy)</p>
+                            </li>
+                            <li class="mb-4">
+                                <span class="absolute flex items-center justify-center w-6 h-6 bg-gray-300 rounded-full -left-3 ring-8 ring-white"><svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20"><path d="M10 18a8 8 0 100-16 8 8 0 000 16z"/></svg></span>
+                                <h4 class="font-semibold text-gray-500">${translate('OutForDelivery')}</h4>
+                                <p class="text-sm text-gray-400">Expected: ${new Date(Date.now() + 86400000 * 3).toLocaleDateString('en-GB')}</p>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <div class="flex justify-between space-x-4 mt-6">
+                        <button class="bg-gray-200 text-gray-800 font-semibold py-2 rounded-lg w-1/2" onclick="alert('SUMMARY: Total Value: ₹14,400. Buyer: Sikander Sinha. Pickup Location: Pune.')">${translate('Summary')}</button>
+                        <button class="bg-gray-200 text-gray-800 font-semibold py-2 rounded-lg w-1/2" onclick="alert('BILL: Price Breakup: Item Price + Taxes + Kisan Setu Commission (0%).')">${translate('ViewBill')}</button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderNotifications() {
+        // ... (Notifications rendering code is omitted for brevity)
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('Notifications')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                <div class="p-6 text-center text-gray-500 flex-grow">
+                    <p>${translate('No new notifications found.')}</p>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderMenu() {
+        // ... (Menu rendering code is omitted for brevity)
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('Menu')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                <div class="p-6 flex-grow">
+                    <!-- Menu Items as per user's full list (image_c6f5e9.png right side) -->
+                    <button class="menu-item" onclick="alert('${translate('MyProfile')} ${translate('feature')}')">${translate('MyProfile')}</button>
+                    <button class="menu-item" onclick="alert('${translate('EditProfile')} ${translate('feature')}')">${translate('EditProfile')}</button>
+                    <button class="menu-item" onclick="navigate('addProduct')">${translate('AddProduct')}</button>
+                    <button class="menu-item" onclick="navigate('findDealer')">${translate('FindDealer')}</button>
+                    <button class="menu-item" onclick="alert('${translate('FindSeller')} ${translate('feature')}')">${translate('FindSeller')}</button>
+                    <button class="menu-item" onclick="alert('${translate('KisanSetuWallet')} ${translate('feature')}')">${translate('KisanSetuWallet')}</button>
+                    <button class="menu-item" onclick="alert('${translate('MyStorage')} ${translate('feature')}')">${translate('MyStorage')}</button>
+                    <button class="menu-item" onclick="alert('${translate('TransactionHistory')} ${translate('feature')}')">${translate('TransactionHistory')}</button>
+                    <button class="menu-item" onclick="navigate('activeOffers')">${translate('ActiveOffers')}</button>
+                    <button class="menu-item" onclick="alert('${translate('FindTransportation')} ${translate('feature')}')">${translate('FindTransportation')}</button>
+                    <button class="w-full text-left p-3 border-b hover:bg-gray-100 font-medium" onclick="toggleLanguage()">🌐 ${translate('PreferredLanguage')} (${appData.currentLanguage === 'hi' ? 'English' : 'हिन्दी'})</button>
+                    <button class="menu-item text-red-600" onclick="logoutUser()">${translate('Logout')}</button>
+                </div>
+            </div>
+        `;
+    }
+    
+    function renderFindDealer() {
+        // ... (Find Dealer rendering code is omitted for brevity)
+        const dealers = [
+            { name: 'M.S Dhoni', id: 'msd', rating: 4.9 }, 
+            { name: 'Virat Kohli', id: 'vk', rating: 4.7 }, 
+            { name: 'Yuvraj Singh', id: 'ys', rating: 4.5 }
+        ];
+
+        const dealerListHtml = dealers.map(dealer => `
+            <div class="flex justify-between items-center p-3 border-b border-gray-200 cursor-pointer hover:bg-gray-50" 
+                 onclick="navigate('negotiate', { dealer: '${dealer.name}', buyerId: '${dealer.id}' })">
+                <div class="flex items-center">
+                    <svg class="w-6 h-6 mr-3 text-gray-700" viewBox="0 0 24 24" fill="currentColor"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>
+                    <span class="font-medium">${dealer.name}</span>
+                    <span class="text-yellow-500 ml-2 text-sm">★${dealer.rating}</span>
+                </div>
+                <span class="text-xl text-gray-500">&gt;</span>
+            </div>
+        `).join('');
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('menu')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('FindDealer')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                
+                <div class="p-4 flex-grow overflow-y-auto">
+                    <h3 class="text-lg font-semibold mb-4 border-b pb-2">Dealers Near You</h3>
+                    ${dealerListHtml}
+                </div>
+            </div>
+        `;
+    }
+
+    
+    // --- Initializer and Renderer ---
+    function scrollHorizontalMenu(direction) {
+        const container = document.getElementById('horizontal-menu');
+        if (container) {
+            container.scrollLeft += direction * 100; // Scroll by 100px
+        }
+    }
+
+    function renderScreen(data = {}) {
+        document.getElementById('app-content').classList.remove('justify-center');
+        document.getElementById('app-content').innerHTML = ''; // Clear content first
+
+        switch (appData.currentScreen) {
+            case 'login':
+                renderLogin();
+                break;
+            case 'register':
+                renderRegister();
+                break;
+            case 'farmerProfileSetup':
+                renderFarmerProfileSetup();
+                break;
+            case 'dashboard':
+                renderDashboard();
+                break;
+            case 'addProduct':
+                renderAddProduct(1); // Start at step 1
+                break;
+            case 'addProductPricing': // New screen for step 2
+                renderAddProduct(2);
+                break;
+            case 'listedSuccessfully':
+                renderListedSuccessfully();
+                break;
+            case 'activeOffers':
+                renderActiveOffers();
+                break;
+            case 'negotiate':
+                renderNegotiate(data);
+                break;
+            case 'myListingsActive':
+                renderMyListingsActive();
+                break;
+            case 'myListingsSold':
+                renderMyListingsSold();
+                break;
+            case 'trackOrder':
+                renderTrackOrder();
+                break;
+            case 'notifications': // Handle notifications
+                renderNotifications();
+                break;
+            case 'menu': // Handle menu
+                renderMenu();
+                break;
+            case 'editListing':
+                renderEditListing(data.id);
+                break;
+            case 'findDealer':
+                renderFindDealer();
+                break;
+            default:
+                renderLogin();
+        }
+    }
+    
+    // Logo HTML helper (Uses actual image URL for visual fidelity)
+    function getLogoHtml(small = false) {
+        const size = small ? 'w-8 h-8' : 'w-20 h-20';
+        // Placeholder image URL for the Kisan Setu logo (Hands + Leaf)
+        const logoUrl = "Gemini_Generated_Image_f4mbl0f4mbl0f4mb.png"; 
+        return `
+            <div class="flex items-center justify-center ${small ? '' : 'mb-4'}">
+                <img src="${logoUrl}" alt="Kisan Setu Logo" class="${size} rounded-full border border-gray-200" onerror="this.onerror=null;this.src='https://placehold.co/100x100/48BB78/FFFFFF?text=K.S';" />
+            </div>
+        `;
+    }
+
+    // Initialize the app
+    const initialScreen = loadData();
+    // Pre-populate offers if starting fresh for a demo
+    if (Object.keys(appData.users).length === 0) {
+        appData.users['9060214219-farmer'] = {
+            id: '9060214219-farmer',
+            phone: '9060214219',
+            name: 'राघव आनंद',
+            role: 'farmer',
+            isProfileSetup: true,
+            primaryCrop: 'Tomato',
+            region: 'Pune, MH'
+        };
+        appData.listings = [
+            { id: 101, farmerId: '9060214219-farmer', crop: 'Tomato', quantity: 15, unit: 'Quintals', price: 22, grade: 'A', date: '24-10-2025', status: 'Active', offers: [] },
+            { id: 102, farmerId: '9060214219-farmer', crop: 'Potato', quantity: 18, unit: 'Quintals', price: 24, grade: 'B', date: '22-10-2025', status: 'Sold', soldAtPrice: 25, offers: [] }
+        ];
+        appData.offers = [
+             { listingId: 101, buyer: simulatedBuyers[0], offerPrice: 20, offerId: 1001 },
+             { listingId: 101, buyer: simulatedBuyers[1], offerPrice: 21, offerId: 1002 },
+             { listingId: 101, buyer: simulatedBuyers[2], offerPrice: 22, offerId: 1003 },
+        ];
+    }
+
+
+    renderScreen();
+</script>
+
+</body>
+</html>
