@@ -127,6 +127,7 @@
             border: 2px solid #38A169; /* Green border */
             border-radius: 0.5rem;
             padding: 1rem;
+            margin-top: 1.5rem;
             box-shadow: 0 2px 4px rgba(0,0,0,0.05);
         }
         /* Menu bar styling */
@@ -317,6 +318,7 @@
         'MyListings': { hi: 'मेरी लिस्टिंग', en: 'My Listings' },
         'ViewAll': { hi: 'सभी देखें', en: 'View all' },
         'AddProduct': { hi: 'उत्पाद जोड़ें', en: 'Add Product' },
+        'StoreProduct': { hi: 'उत्पाद भंडार', en: 'Store Product' },
         'Quantity': { hi: 'मात्रा', en: 'Quantity' },
         'Unit': { hi: 'इकाई', en: 'Unit' },
         'Grade': { hi: 'ग्रेड', en: 'Grade' },
@@ -486,10 +488,19 @@
 
     // --- Core Navigation and Logic Handlers ---
 
-    function navigate(screenName, data = {}) {
-        appData.currentScreen = screenName;
-        renderScreen(data);
-    }
+function navigate(screenName, data = {}) {
+    // Normalize incoming screenName to a known screen (case/spacing tolerant)
+    const knownScreens = [
+        'login','register','farmerProfileSetup','dashboard',
+        'addProduct','addProductPricing','StoreProduct','listedSuccessfully',
+        'activeOffers','negotiate','myListingsActive', 'myListingsStored', 'myListingsSold',
+        'trackOrder','notifications','menu','editListing','findDealer'
+    ];
+    const normalizedKey = String(screenName).toLowerCase().replace(/\s+/g, '');
+    const normalized = knownScreens.find(s => s.toLowerCase() === normalizedKey) || screenName;
+    appData.currentScreen = normalized;
+    renderScreen(data);
+}
 
     function toggleLanguage() {
         appData.currentLanguage = appData.currentLanguage === 'hi' ? 'en' : 'hi';
@@ -619,6 +630,22 @@
         navigate('addProductPricing'); // Navigate to step 2
     }
 
+    function collectProductDetails2() {
+        const crop = document.getElementById('add-crop').value;
+        const quantity = parseFloat(document.getElementById('add-quantity').value);
+        const unit = document.getElementById('add-unit').value;
+        const grade = document.getElementById('add-grade').value;
+        const date = document.getElementById('add-date').value;
+
+        if (!crop || !quantity || !unit || !grade || !date) {
+             alert(translate('Please fill all product details before proceeding.'));
+             return;
+        }
+        
+        currentListingData = { crop, quantity, unit, grade, date };
+        navigate('storeProductPricing'); // Navigate to step 2
+    }
+
     function getMandiPrice(crop, region) {
         if (mandiData[crop] && mandiData[crop][region]) { return mandiData[crop][region]; }
         return { min: 10, max: 35, unit: 'Kg', trend: 'stable' };
@@ -695,6 +722,50 @@
         currentListingData = {}; 
 
         navigate('listedSuccessfully');
+    }
+
+    function listStoredProduct() {
+        const price = parseFloat(document.getElementById('add-price').value);
+        const rechecked = document.getElementById('rechecked-details').checked;
+        
+        // Use the globally stored data from Step 1
+        const { crop, quantity, unit, grade, date } = currentListingData;
+
+        if (!price || !rechecked || !crop) {
+            alert(translate('Please enter price and confirm details.'));
+            return;
+        }
+
+        const newListing2 = {
+            id: Date.now(),
+            farmerId: appData.currentUser.id, // Associate listing with current user
+            crop: crop,
+            quantity: quantity,
+            unit: unit,
+            price: price,
+            grade: grade,
+            date: date,
+            status: 'Stored', // Default status
+
+        };
+        appData.listings.push(newListing2);
+        saveToLocalStorage();
+        
+        // Simulating a new offer for demo purposes
+        // if (newListing.crop === 'Tomato' && newListing.farmerId === appData.currentUser.id) {
+        //     appData.offers.push({
+        //         listingId: newListing.id,
+        //         buyer: simulatedBuyers[0],
+        //         offerPrice: newListing.price - 2,
+        //         offerId: Date.now() + 1
+        //     });
+        //     saveToLocalStorage();
+        // }
+        
+        // Clear temp data
+        currentListingData = {}; 
+
+        navigate('StoredSuccessfully');
     }
 
     // --- LISTING MANAGEMENT FUNCTIONS (New Feature) ---
@@ -782,6 +853,75 @@
             
             saveToLocalStorage();
             navigate('myListingsActive');
+        }
+    }
+
+    function renderEditListing(id) {
+        const listing = appData.listings.find(l => l.id === id);
+        if (!listing) return navigate('myListingsActive');
+        
+        const regions = Object.keys(mandiData.Tomato); // Using Tomato as a base for regions
+        const priceData = getMandiPrice(listing.crop, listing.region || appData.currentUser.region);
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="font-semibold text-gray-600" onclick="navigate('myListingsActive')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('EditListingTitle')}</h2>
+                    <span class="w-10"></span>
+                </div>
+
+                <div class="p-6 flex-grow overflow-y-auto">
+                    <h3 class="text-lg font-semibold mb-4 text-gray-800">${translate('Product')}: ${translate(listing.crop)}</h3>
+                    
+                    <!-- Editable Fields -->
+                    <div class="input-group">
+                        <span class="input-label">${translate('Quantity')}</span>
+                        <input type="number" id="edit-quantity" value="${listing.quantity}">
+                    </div>
+                    
+                    <div class="input-group">
+                        <span class="input-label">${translate('Unit')}</span>
+                        <select id="edit-unit" class="p-2">
+                            ${['Quintals', 'Tons', 'Kg'].map(u => `<option value="${u}" ${listing.unit === u ? 'selected' : ''}>${translate(u)}</option>`).join('')}
+                        </select>
+                    </div>
+
+                    <div class="input-group">
+                        <span class="input-label">${translate('Grade')}</span>
+                        <select id="edit-grade" class="p-2">
+                            ${['A', 'B', 'C'].map(g => `<option value="${g}" ${listing.grade === g ? 'selected' : ''}>${translate(g + 'Grade')}</option>`).join('')}
+                        </select>
+                    </div>
+                    
+                    <!-- Price Section -->
+                    <div class="mt-4 mb-4">
+                        <p class="text-sm font-medium text-gray-700">${translate('MarketRange')}: <span class="text-red-600 font-bold">₹${priceData.min}-${priceData.max} / ${priceData.unit}</span></p>
+                        <div class="input-group mt-2">
+                            <span class="input-label">${translate('ExpectedPrice')}</span>
+                            <input type="number" id="edit-price" value="${listing.price}">
+                        </div>
+                    </div>
+
+                    <button class="btn-primary w-full mt-4" onclick="updateStoredListing(${id})">${translate('Update')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function updateStoredListing(id) {
+        const listingIndex = appData.listings.findIndex(l => l.id === id);
+        
+        if (listingIndex !== -1) {
+            appData.listings[listingIndex].quantity = parseFloat(document.getElementById('edit-quantity').value);
+            appData.listings[listingIndex].unit = document.getElementById('edit-unit').value;
+            appData.listings[listingIndex].grade = document.getElementById('edit-grade').value;
+            appData.listings[listingIndex].price = parseFloat(document.getElementById('edit-price').value);
+            
+            saveToLocalStorage();
+            navigate('myListingsStored');
         }
     }
 
@@ -1063,7 +1203,7 @@
                         ${translate('AddProduct')}
                     </button>
 
-                    <button class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg w-full shadow-md" onclick="navigate('storeProduct')">
+                    <button class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-3 px-4 rounded-lg w-full shadow-md" onclick="navigate('StoreProduct')">
                         ${translate('StoreProduct')}
                     </button>
 
@@ -1217,6 +1357,124 @@
         }
     }
 
+    function renderStoreProduct(step = 1) {
+        if (step === 1) {
+            document.getElementById('app-content').innerHTML = `
+                <div class="flex flex-col h-full">
+                    <div class="header">
+                        <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                            <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                        </button>
+                        <span class="text-lg font-semibold">${translate('StoreProduct')}</span>
+                    </div>
+
+                    <div class="p-6 flex-grow overflow-y-auto">
+                        <h2 class="text-2xl font-semibold mb-6 text-red-600">${translate('StoreProduct')}</h2>
+                        
+                        <!-- Crop Name -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('PrimaryCrop')}</span>
+                            <select id="add-crop" class="p-2">
+                                ${Object.keys(mandiData).map(crop => `<option value="${crop}">${translate(crop) || crop}</option>`).join('')}
+                            </select>
+                        </div>
+
+                        <!-- Quantity -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('Quantity')}</span>
+                            <input type="number" id="add-quantity" placeholder="Quantity..." value="15">
+                        </div>
+
+                        <!-- Unit -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('Unit')}</span>
+                            <select id="add-unit" class="p-2">
+                                <option value="Quintals">${translate('Quintals') || 'Quintals'}</option>
+                                <option value="Tons">${translate('Tons') || 'Tons'}</option>
+                                <option value="Kg">${translate('Kg') || 'Kg'}</option>
+                            </select>
+                        </div>
+                        
+                        <!-- Quality Grade -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('Grade')}</span>
+                            <select id="add-grade" class="p-2">
+                                <option value="A">${translate('AGrade') || 'A Grade (उत्कृष्ट)'}</option>
+                                <option value="B">${translate('BGrade') || 'B Grade (अच्छा)'}</option>
+                                <option value="C">${translate('CGrade') || 'C Grade (सामान्य)'}</option>
+                            </select>
+                        </div>
+
+                        <!-- Availability Date -->
+                        <div class="input-group">
+                            <span class="input-label">${translate('AvailabilityDate')}</span>
+                            <input type="text" id="add-date" placeholder="DD-MM-YYYY" value="25-10-2025">
+                        </div>
+
+                        <button class="bg-blue-500 text-white font-semibold py-3 rounded-lg w-full" onclick="collectProductDetails2()">${translate('Next')}</button>
+                    </div>
+                </div>
+            `;
+        } else {
+            // STEP 2: PRICING SCREEN with Dynamic Feedback
+            const currentCrop = currentListingData.crop;
+            const region = appData.currentUser.region || 'Pune, MH';
+            const priceData = getMandiPrice(currentCrop, region);
+            const mandiRangeText = `₹${priceData.min}-${priceData.max} / ${priceData.unit}`;
+            
+            // Functionality for dynamic feedback is in the script tag below
+            document.getElementById('app-content').innerHTML = `
+                <div class="flex flex-col h-full">
+                    <div class="header">
+                        <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('StoreProduct')">
+                            <span class="text-lg mr-1">&larr;</span> ${translate('StoreProduct')}
+                        </button>
+                        <span class="text-lg font-semibold">${translate('Pricing')}</span>
+                    </div>
+
+                    <div class="p-6 flex-grow overflow-y-auto">
+                        <h2 class="text-2xl font-semibold mb-6 text-red-600">${translate('Pricing')}</h2>
+
+                        <!-- Market Range Display (USP) -->
+                        <div class="mb-4">
+                            <p class="text-sm font-medium text-gray-700">${translate('MarketRange')}:</p>
+                            <h3 class="text-xl font-bold text-red-600">${mandiRangeText}</h3>
+                        </div>
+
+                        <!-- Expected Price Input -->
+                        <div class="input-group border-red-500">
+                            <span class="input-label">${translate('ExpectedPrice')}</span>
+                            <input type="number" id="add-price" placeholder="Enter Price per ${priceData.unit}..." oninput="updatePriceFeedback('${currentCrop}', '${region}')" value="">
+                        </div>
+
+                        <!-- Dynamic Feedback Box -->
+                        <div id="price-feedback" class="p-3 mb-6 rounded-lg text-sm font-semibold border-2 border-gray-300 text-gray-600">
+                            ${translate('DynamicFeedbackBox')}
+                        </div>
+
+                        <!-- Confirmation Checkbox -->
+                        <div class="flex items-center mb-6">
+                            <input type="checkbox" id="rechecked-details" class="mr-2">
+                            <label for="rechecked-details" class="text-sm">${translate('I have rechecked all the details') || 'I have rechecked all the details'}</label>
+                        </div>
+
+                        <!-- Action Buttons - DITTO COLORS -->
+                        <div class="flex justify-between space-x-4">
+                            <button class="bg-yellow-300 text-gray-800 font-semibold py-3 rounded-lg w-1/2" onclick="navigate('myListingsStored')">${translate('StoreProduct')}</button>
+                            <button class="bg-lime-500 text-white font-semibold py-3 rounded-lg w-1/2" onclick="renderStoredSuccessfully()">
+                                ${translate('StoreProduct')}
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            // Trigger initial feedback update
+            document.getElementById('add-price').value = priceData.max + 2; // Example starting price
+            updatePriceFeedback(currentCrop, region);
+        }
+    }
+
+
     function renderListedSuccessfully() {
         // ... (Listed Successfully rendering code is omitted for brevity)
         document.getElementById('app-content').innerHTML = `
@@ -1235,6 +1493,26 @@
             </div>
         `;
     }
+
+    function renderStoredSuccessfully() {
+        // ... (Stored Successfully rendering code is omitted for brevity)
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full items-center justify-center p-6 text-center">
+                <div class="mb-10">
+                    <svg class="w-32 h-32 text-green-500 mx-auto" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <polyline points="20 6 9 17 4 12"/>
+                    </svg>
+                    <h2 class="text-xl font-semibold mt-4 text-green-700">${translate('StoredSuccessfully')}</h2>
+                </div>
+                
+                <p class="text-gray-600 mb-8">${translate('You can now list your Product.') || 'You can now list your Product.'}</p>
+                
+                <button class="btn-primary w-full max-w-xs" onclick="navigate('dashboard')">${translate('Dashboard')}</button>
+                <button class="text-sm text-blue-500 mt-4" onclick="navigate('myListingsStored')">${translate('ViewAll')} ${translate('MyListingsStored')}</button>
+            </div>
+        `;
+    }
+
 
     function renderActiveOffers() {
         // ... (Active Offers rendering code is omitted for brevity)
@@ -1432,6 +1710,7 @@
                 
                 <div class="flex justify-around bg-gray-100 p-2 border-b border-gray-200">
                     <button class="font-bold text-green-600 border-b-2 border-green-600 p-1">${translate('Active')}</button>
+                    <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsStored')">${translate('Stored')}</button>
                     <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsSold')">${translate('Sold')}</button>
                 </div>
 
@@ -1441,6 +1720,61 @@
                 
                 <div class="p-4 border-t border-gray-200">
                     <button class="btn-primary w-full" onclick="navigate('addProduct')">${translate('AddNewProduct')}</button>
+                </div>
+            </div>
+        `;
+    }
+
+    function renderMyListingsStored() {
+        // ... (My Listings Active rendering code is omitted for brevity)
+        const storedListingsHtml = appData.listings.filter(l => l.status === 'Stored' && l.farmerId === appData.currentUser.id).map(l => {
+            const region = appData.currentUser.region || 'Pune, MH';
+            const priceData = getMandiPrice(l.crop, region);
+
+            return `
+                <div class="bg-white p-4 rounded-xl shadow-md mb-4 flex items-center border border-green-100">
+                    <div class="mr-4">
+                        <!-- Image of Tomato/Potato -->
+                        <svg class="w-16 h-16" viewBox="0 0 24 24" fill="#6EE7B7" xmlns="http://www.w3.org/2000/svg"><circle cx="12" cy="12" r="10" fill="#6EE7B7"/><path d="M12 16.5c-2.49 0-4.5-2.01-4.5-4.5S9.51 7.5 12 7.5s4.5 2.01 4.5 4.5-2.01 4.5-4.5 4.5z" fill="#34D399"/></svg>
+                    </div>
+                    <div class="flex-grow">
+                        <h3 class="text-lg font-bold">${translate(l.crop) || l.crop} <span class="text-sm font-normal">(${l.quantity} ${translate(l.unit) || translate(l.unit)})</span></h3>
+                        <p class="text-sm text-gray-600">${translate('StoredOn')}: ${l.date || '24-10-2025'}</p>
+                        <p class="text-xs text-red-500 font-semibold">${translate('MarketPrice')}: ₹${priceData.min}-${priceData.max}</p>
+                        <p class="text-sm font-medium mt-1">${translate('TotalOffers')}: <span class="text-blue-600">${appData.offers.filter(o => o.listingId === l.id).length}</span></p>
+                    </div>
+                    
+                    <div class="flex flex-col space-y-2">
+                        <button class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 text-xs font-bold py-1 px-2 rounded" onclick="renderEditListing(${l.id})">${translate('Edit')}</button>
+                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded" onclick="listProduct()(${l.id})">${translate('LIST in Market')}</button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+
+        document.getElementById('app-content').innerHTML = `
+            <div class="flex flex-col h-full">
+                <div class="header">
+                    <button class="border border-gray-400 font-semibold text-gray-600 px-3 py-1 rounded-lg" onclick="navigate('dashboard')">
+                        <span class="text-lg mr-1">&larr;</span> ${translate('Back')}
+                    </button>
+                    <h2 class="text-xl font-bold">${translate('MyListings')}</h2>
+                    <span class="w-10"></span>
+                </div>
+                
+                <div class="flex justify-around bg-gray-100 p-2 border-b border-gray-200">
+                    <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsActive')">${translate('Active')}</button>
+                    <button class="font-bold text-green-600 border-b-2 border-green-600 p-1">${translate('Stored')}</button>
+                    <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsSold')">${translate('Sold')}</button>
+                </div>
+
+
+                <div class="p-4 flex-grow overflow-y-auto">
+                    ${storedListingsHtml.length ? storedListingsHtml : `<p class="text-center text-gray-500 mt-10">${translate('No stored listings yet. Store a new product!')}</p>`}
+                </div>
+                
+                <div class="p-4 border-t border-gray-200">
+                    <button class="btn-primary w-full" onclick="navigate('StoreProduct')">${translate('StoreProduct')}</button>
                 </div>
             </div>
         `;
@@ -1478,6 +1812,7 @@
                 
                 <div class="flex justify-around bg-gray-100 p-2 border-b border-gray-200">
                     <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsActive')">${translate('Active')}</button>
+                    <button class="font-semibold text-gray-500 p-1" onclick="navigate('myListingsStored')">${translate('Stored')}</button>
                     <button class="font-bold text-blue-600 border-b-2 border-blue-600 p-1">${translate('Sold')}</button>
                 </div>
 
@@ -1576,10 +1911,12 @@
                     <button class="menu-item" onclick="alert('${translate('MyProfile')} ${translate('feature')}')">${translate('MyProfile')}</button>
                     <button class="menu-item" onclick="alert('${translate('EditProfile')} ${translate('feature')}')">${translate('EditProfile')}</button>
                     <button class="menu-item" onclick="navigate('addProduct')">${translate('AddProduct')}</button>
-                    <button class="menu-item" onclick="navigate('findDealer')">${translate('FindDealer')}</button>
+                    <button class="menu-item" onclick="navigate('FindDealer')">${translate('FindDealer')}</button>
                     <button class="menu-item" onclick="alert('${translate('FindSeller')} ${translate('feature')}')">${translate('FindSeller')}</button>
                     <button class="menu-item" onclick="alert('${translate('KisanSetuWallet')} ${translate('feature')}')">${translate('KisanSetuWallet')}</button>
-                    <button class="menu-item" onclick="alert('${translate('MyStorage')} ${translate('feature')}')">${translate('MyStorage')}</button>
+                    <button class="menu-item" onclick="navigate('myListingsStored')">
+                    ${translate('MyStorage')}
+</button>
                     <button class="menu-item" onclick="alert('${translate('TransactionHistory')} ${translate('feature')}')">${translate('TransactionHistory')}</button>
                     <button class="menu-item" onclick="navigate('activeOffers')">${translate('ActiveOffers')}</button>
                     <button class="menu-item" onclick="alert('${translate('FindTransportation')} ${translate('feature')}')">${translate('FindTransportation')}</button>
@@ -1593,9 +1930,9 @@
     function renderFindDealer() {
         // ... (Find Dealer rendering code is omitted for brevity)
         const dealers = [
-            { name: 'M.S Dhoni', id: 'msd', rating: 4.9 }, 
-            { name: 'Virat Kohli', id: 'vk', rating: 4.7 }, 
-            { name: 'Yuvraj Singh', id: 'ys', rating: 4.5 }
+            { name: 'Krishna Murthy', id: 'km', rating: 4.9 }, 
+            { name: 'Chandra Devi', id: 'cd', rating: 4.7 }, 
+            { name: 'Jograj Singh', id: 'js', rating: 4.5 }
         ];
 
         const dealerListHtml = dealers.map(dealer => `
@@ -1660,6 +1997,12 @@
             case 'addProductPricing': // New screen for step 2
                 renderAddProduct(2);
                 break;
+            case 'StoreProduct':
+                renderStoreProduct(1); // Start at step 1
+                break;
+            case 'storeProductPricing': // New screen for step 2
+                renderStoreProduct(2);
+                break;  
             case 'listedSuccessfully':
                 renderListedSuccessfully();
                 break;
@@ -1671,6 +2014,9 @@
                 break;
             case 'myListingsActive':
                 renderMyListingsActive();
+                break;
+            case 'myListingsStored':
+                renderMyListingsStored();
                 break;
             case 'myListingsSold':
                 renderMyListingsSold();
