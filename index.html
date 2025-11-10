@@ -45,12 +45,14 @@
             width: 100%; 
         }
         .input-label {
-            padding: 0.75rem 1rem;
-            background-color: #e9ecef;
+            padding: 1.1rem 1rem;
+            border-radius: inherit;
+            box-shadow: inset 0px 4px 4px 0px rgba(0, 0, 0, 0.25), 0px 4px 4px 0px rgba(0, 0, 0, 0.25);
+            background-color: #ffffff;
             color: #495057;
             font-size: 0.875rem;
             white-space: nowrap;
-            font-weight: 500;
+            font-weight: 1000;
         }
         input[type="text"], input[type="number"], select, textarea {
             flex-grow: 1;
@@ -976,14 +978,14 @@ function navigate(screenName, data = {}) {
                     <!-- Mob. No. & Send OTP -->
                     <div class="input-group login-input-group">
                         <span class="input-label">${translate('MobNo')}</span>
-                        <input type="number" id="login-phone" placeholder="+91 90XXXXXX" value="9060214219" class="border-l border-gray-300">
+                        <input type="number" id="login-phone" placeholder="90XXXXXXXX" value="" class="border-l border-gray-300">
                         <button class="bg-gray-300 text-sm p-2 font-medium h-full" onclick="alert('${translate('SendOTP')} - 080604')">${translate('SendOTP')}</button>
                     </div>
 
                     <!-- OTP & Validate -->
                     <div class="input-group login-input-group">
                         <span class="input-label">OTP</span>
-                        <input type="text" id="login-otp" placeholder="080604" value="080604" class="border-l border-gray-300">
+                        <input type="text" id="login-otp" placeholder="Enter OTP" value="" class="border-l border-gray-300">
                         <button class="bg-gray-300 text-sm p-2 font-medium h-full" onclick="checkLogin()">${translate('Validate')}</button>
                     </div>
                     
@@ -1019,13 +1021,13 @@ function navigate(screenName, data = {}) {
                     <!-- Name -->
                     <div class="input-group">
                         <span class="input-label">${translate('FullName')}</span>
-                        <input type="text" id="reg-name" placeholder="Raghav Anand" value="Raghav Anand">
+                        <input type="text" id="reg-name" placeholder="Enter your Name" value="">
                     </div>
                     
                     <!-- Phone & Send OTP (FIXED UI) -->
                     <div class="input-group mb-4" style="padding: 0;">
                         <span class="input-label">${translate('MobNo')}</span>
-                        <input type="number" id="reg-phone" placeholder="+91 90XXXXXX" value="9060214219" style="padding:0.75rem 0.5rem; border:none; width:45%;">
+                        <input type="number" id="reg-phone" placeholder="+90XXXXXXXX" value="" style="padding:0.75rem 0.5rem; border:none; width:45%;">
                         <button class="bg-gray-300 text-sm p-2 font-medium" style="width:25%; border-radius:0;" onclick="alert('${translate('SendOTP')} - ' + localStorage.getItem('regOTP'))">${translate('SendOTP')}</button>
                     </div>
                     
@@ -1038,8 +1040,8 @@ function navigate(screenName, data = {}) {
 
                     <!-- Address -->
                     <div class="input-group">
-                        <span class="input-label">${translate('Address')}</span>
-                        <input type="text" id="reg-address" placeholder="Village, District, State" value="Pune, Maharashtra">
+                        <span class="input-label">${translate('Enter your Address')}</span>
+                        <input type="text" id="reg-address" placeholder="Village, District, State" value="">
                     </div>
                     
                     <!-- Role Selection -->
@@ -1052,6 +1054,8 @@ function navigate(screenName, data = {}) {
                     </div>
                     
                     <button class="btn-primary w-full mt-4 mb-8" onclick="submitRegistration()">${translate('Register')}</button>
+
+                    <button class="bg-gray-400 text-white font-semibold py-3 rounded-lg mb-4" onclick="renderLogin">${translate('Login')}</button>
                 </div>
             </div>
         `;
@@ -1745,7 +1749,6 @@ function navigate(screenName, data = {}) {
                     
                     <div class="flex flex-col space-y-2">
                         <button class="bg-yellow-400 hover:bg-yellow-500 text-gray-800 text-xs font-bold py-1 px-2 rounded" onclick="renderEditListing(${l.id})">${translate('Edit')}</button>
-                        <button class="bg-red-500 hover:bg-red-600 text-white text-xs font-bold py-1 px-2 rounded" onclick="listProduct()(${l.id})">${translate('LIST in Market')}</button>
                     </div>
                 </div>
             `;
