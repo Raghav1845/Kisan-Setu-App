@@ -160,7 +160,7 @@
         }
         .scroll-item {
             display: inline-block;
-            padding: 10px 18px;
+            padding: 18px 18px;
             border-radius: 10px;
             font-size: 0.875rem;
             font-weight: 600;
@@ -169,11 +169,11 @@
             box-shadow: 0 1px 2px rgba(0,0,0,0.1);
         }
         .scroll-arrow {
-            width: 25px;
-            height: 25px;
+            width: 50px;
+            height: 50px;
             border-radius: 50%;
             border: 1px solid #9CA3AF;
-            color: #9CA3AF;
+            color: #ff0000;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -979,14 +979,13 @@ function navigate(screenName, data = {}) {
                     <div class="input-group login-input-group">
                         <span class="input-label">${translate('MobNo')}</span>
                         <input type="number" id="login-phone" placeholder="90XXXXXXXX" value="" class="border-l border-gray-300">
-                        <button class="bg-gray-300 text-sm p-2 font-medium h-full" onclick="alert('${translate('SendOTP')} - 080604')">${translate('SendOTP')}</button>
+                        <button class="bg-yellow-300 text-sm p-2 font-medium h-full" onclick="alert('${translate('SendOTP')} - 080604')">${translate('SendOTP')}</button>
                     </div>
 
                     <!-- OTP & Validate -->
                     <div class="input-group login-input-group">
                         <span class="input-label">OTP</span>
                         <input type="text" id="login-otp" placeholder="Enter OTP" value="" class="border-l border-gray-300">
-                        <button class="bg-gray-300 text-sm p-2 font-medium h-full" onclick="checkLogin()">${translate('Validate')}</button>
                     </div>
                     
                     <!-- Role Selection -->
@@ -1028,14 +1027,13 @@ function navigate(screenName, data = {}) {
                     <div class="input-group mb-4" style="padding: 0;">
                         <span class="input-label">${translate('MobNo')}</span>
                         <input type="number" id="reg-phone" placeholder="+90XXXXXXXX" value="" style="padding:0.75rem 0.5rem; border:none; width:45%;">
-                        <button class="bg-gray-300 text-sm p-2 font-medium" style="width:25%; border-radius:0;" onclick="alert('${translate('SendOTP')} - ' + localStorage.getItem('regOTP'))">${translate('SendOTP')}</button>
+                        <button class="bg-yellow-300 text-sm p-2 font-medium" style="width:25%; border-radius:inherit;" onclick="alert('${translate('SendOTP')} - ' + localStorage.getItem('regOTP'))">${translate('SendOTP')}</button>
                     </div>
                     
                     <!-- OTP -->
                     <div class="input-group">
                         <span class="input-label">OTP</span>
                         <input type="text" id="reg-otp" placeholder="Enter OTP">
-                        <button class="bg-gray-300 text-sm p-2 font-medium" onclick="alert('${translate('Validate')}')">${translate('Validate')}</button>
                     </div>
 
                     <!-- Address -->
@@ -1176,10 +1174,12 @@ function navigate(screenName, data = {}) {
                 <div id="horizontal-menu" class="scroll-menu">
                     <button class="scroll-item bg-pink-300 text-gray-800" onclick="navigate('activeOffers')">${translate('ActiveOffers')}</button>
                     <button class="scroll-item bg-orange-400 text-gray-800" onclick="navigate('myListingsActive')">${translate('MyListings')}</button>
-                    <button class="scroll-item bg-lime-500 text-white" onclick="alert('${translate('KisanHelp')} ${translate('feature')}')">${translate('KisanHelp')}</button>
+                    <button class="scroll-item bg-lime-500 text-white" onclick="renderKisanHelp()">
+                    ${translate('KisanHelp')}</button>
                     <button class="scroll-item bg-purple-500 text-white" onclick="navigate('myListingsSold')">${translate('PastSell')}</button>
                     <button class="scroll-item bg-red-500 text-white" onclick="navigate('trackOrder')">${translate('OrderTracking')}</button>
                     <button class="scroll-item bg-yellow-500 text-white" onclick="alert('${translate('FindStorage')} ${translate('feature')}')">${translate('FindStorage')}</button>
+                    <button class="scroll-item bg-green-500 text-white" onclick="alert('${translate('TrackHelp')} ${translate('TrackHelp')}')">${translate('Track Help')}</button>
                 </div>
                 <div class="scroll-arrow" onclick="scrollHorizontalMenu(1)">
                     <span class="text-sm">&gt;</span>
@@ -1742,9 +1742,7 @@ function navigate(screenName, data = {}) {
                     </div>
                     <div class="flex-grow">
                         <h3 class="text-lg font-bold">${translate(l.crop) || l.crop} <span class="text-sm font-normal">(${l.quantity} ${translate(l.unit) || translate(l.unit)})</span></h3>
-                        <p class="text-sm text-gray-600">${translate('StoredOn')}: ${l.date || '24-10-2025'}</p>
                         <p class="text-xs text-red-500 font-semibold">${translate('MarketPrice')}: ₹${priceData.min}-${priceData.max}</p>
-                        <p class="text-sm font-medium mt-1">${translate('TotalOffers')}: <span class="text-blue-600">${appData.offers.filter(o => o.listingId === l.id).length}</span></p>
                     </div>
                     
                     <div class="flex flex-col space-y-2">
@@ -1896,6 +1894,117 @@ function navigate(screenName, data = {}) {
             </div>
         `;
     }
+
+    function renderKisanHelp() {
+    document.getElementById('app-content').innerHTML = `
+        <div class="flex flex-col h-full bg-gray-50 p-4 sm:p-6">
+            
+            <!-- Header (Back Button and Title) -->
+            <div class="flex justify-between items-center pb-4 mb-4 border-b border-gray-200">
+                <button class="flex items-center text-gray-700 hover:text-green-700 font-semibold" onclick="navigate('dashboard')">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    ${translate('Back')}
+                </button>
+                <h2 class="text-2xl font-extrabold text-green-700">${translate('KisanHelpDesk')}</h2>
+                <span class="w-10"></span> <!-- Spacer -->
+            </div>
+            
+            <!-- Form Area -->
+            <div class="flex-grow overflow-y-auto p-2">
+                <p class="text-sm text-gray-600 mb-6">${translate('Submit your query for expert advice.')}</p>
+
+                <form id="kisanHelpForm" onsubmit="event.preventDefault(); handleKisanSubmission();" class="bg-white p-6 rounded-xl shadow-lg border border-green-100">
+                    
+                    <div class="mb-4">
+                        <label for="kisanName" class="block text-sm font-medium text-gray-700 mb-1">${translate('Your Name')}</label>
+                        <input type="text" id="kisanName" name="kisanName" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                               focus:ring-2 focus:ring-black focus:border-black transition duration-150"> 
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="contactInfo" class="block text-sm font-medium text-gray-700 mb-1">${translate('Contact (Phone/Email)')}</label>
+                        <input type="text" id="contactInfo" name="contactInfo" required
+                               class="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                               focus:ring-2 focus:ring-black focus:border-black transition duration-150"> 
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="problemType" class="block text-sm font-medium text-gray-700 mb-1">${translate('Problem Category')}</label>
+                        <select id="problemType" name="problemType" required
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                                focus:ring-2 focus:ring-black focus:border-black bg-white transition duration-150"> 
+                            <option value="">${translate('Select a category')}</option>
+                            <option value="Pest">${translate('Pest Control')}</option>
+                            <option value="Soil">${translate('Soil Health')}</option>
+                            <option value="Water">${translate('Water Management')}</option>
+                            <option value="Seeds">${translate('Seed Information')}</option>
+                            <option value="Other">${translate('Other')}</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="queryDetail" class="block text-sm font-medium text-gray-700 mb-1">${translate('Detailed Query')}</label>
+                        <textarea id="queryDetail" name="queryDetail" rows="5" required
+                                  class="w-full px-4 py-2 border border-gray-300 rounded-lg 
+                                  focus:ring-2 focus:ring-black focus:border-black transition duration-150"></textarea> 
+                    </div>
+
+                    <button class="scroll-item bg-lime-500 text-white" onclick="renderSubmissionSuccess()">
+                    ${translate('Submit')}</button>
+                </form>
+
+                <!-- Expert Answer Placeholder (Real response comes later) -->
+                <div class="mt-8 p-4 bg-yellow-50 border border-yellow-300 rounded-lg text-sm text-yellow-800">
+                    <p class="font-bold">${translate('Note')}:</p>
+                    <p>${translate('Your query will appear here once an expert has provided a solution.')}</p>
+                </div>
+
+            </div>
+        </div>
+    `;
+}
+
+    function renderSubmissionSuccess(trackingId = 'KSD-99876') {
+    document.getElementById('app-content').innerHTML = `
+        <div class="flex flex-col h-full bg-gray-50 p-4 sm:p-6 justify-center items-center text-center">
+            
+            <div class="bg-white p-8 sm:p-12 rounded-2xl shadow-xl max-w-md mx-auto transform transition duration-500 hover:scale-[1.02]">
+                
+                <!-- Green Tick Icon -->
+                <div class="text-green-600 mb-6 flex justify-center">
+                    <svg class="w-20 h-20" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                </div>
+
+                <h2 class="text-3xl font-extrabold text-green-700 mb-2">
+                    ${translate('Success!')}
+                </h2>
+                <p class="text-gray-600 mb-6 text-lg">
+                    ${translate('Your complaint has been lodged successfully.')}
+                </p>
+                
+                <!-- Tracking ID Display -->
+                <div class="bg-green-50 p-3 rounded-lg border border-green-200 mb-8">
+                    <p class="text-sm text-gray-700 font-medium">${translate('Tracking ID')}:</p>
+                    <p class="text-xl font-bold text-green-800">${trackingId}</p>
+                </div>
+
+                <!-- Track Help Button -->
+                <button onclick="renderTrackHelp()" 
+                        class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg flex items-center justify-center">
+                    <span class="mr-2 text-xl">🔍</span>
+                    ${translate('Track Your Complaint')}
+                </button>
+            </div>
+
+            <button class="mt-8 text-sm text-gray-500 hover:text-green-600 font-medium" onclick="navigate('dashboard')">
+                &larr; ${translate('Go back to Dashboard')}
+            </button>
+        </div>
+    `;
+}
     
     function renderMenu() {
         // ... (Menu rendering code is omitted for brevity)
@@ -1917,17 +2026,89 @@ function navigate(screenName, data = {}) {
                     <button class="menu-item" onclick="alert('${translate('FindSeller')} ${translate('feature')}')">${translate('FindSeller')}</button>
                     <button class="menu-item" onclick="alert('${translate('KisanSetuWallet')} ${translate('feature')}')">${translate('KisanSetuWallet')}</button>
                     <button class="menu-item" onclick="navigate('myListingsStored')">
-                    ${translate('MyStorage')}
-</button>
+                    ${translate('MyStorage')}</button>
                     <button class="menu-item" onclick="alert('${translate('TransactionHistory')} ${translate('feature')}')">${translate('TransactionHistory')}</button>
                     <button class="menu-item" onclick="navigate('activeOffers')">${translate('ActiveOffers')}</button>
                     <button class="menu-item" onclick="alert('${translate('FindTransportation')} ${translate('feature')}')">${translate('FindTransportation')}</button>
                     <button class="w-full text-left p-3 border-b hover:bg-gray-100 font-medium" onclick="toggleLanguage()">🌐 ${translate('PreferredLanguage')} (${appData.currentLanguage === 'hi' ? 'English' : 'हिन्दी'})</button>
                     <button class="menu-item text-red-600" onclick="logoutUser()">${translate('Logout')}</button>
+                    <button class="menu-item" onclick="renderContactUs()">${translate('ContactUs')}</button>
                 </div>
             </div>
         `;
     }
+
+    function renderContactUs() {
+    // Note: Formspree action URL requires a unique ID generated after setting up the form.
+    // === VISHESH DHAYAN DEIN: ISS LINE KO ZAROOR CHANGE KAREIN ===
+    // Formspree se mila 5-6 digit ka code "f/" ke baad aayega. Example: "https://formspree.io/f/mxyggyw"
+    const formsPreeActionUrl = "https://formspree.io/f/xkgknned";
+
+    document.getElementById('app-content').innerHTML = `
+        <div class="flex flex-col h-full bg-gray-50 p-4 sm:p-6">
+            
+            <!-- Header (Back Button and Title) -->
+            <div class="flex justify-between items-center pb-4 mb-4 border-b border-gray-200">
+                <button class="flex items-center text-gray-700 hover:text-green-700 font-semibold" onclick="navigate('dashboard')">
+                    <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                    ${translate('Back')}
+                </button>
+                <h2 class="text-2xl font-extrabold text-blue-700">${translate('ContactUs')}</h2>
+                <span class="w-10"></span> <!-- Spacer -->
+            </div>
+            
+            <!-- Contact Form Area -->
+            <div class="flex-grow overflow-y-auto p-2">
+                <p class="text-md text-gray-600 mb-6">${translate('We are here to help you. Send us a message and we will respond as soon as possible.')}</p>
+
+                <!-- Formspree Integration -->
+                <!-- Jab aap 'Send Message' dabayenge, yeh form Formspree par submit hoga -->
+                <form action="${formsPreeActionUrl}" method="POST" class="bg-white p-6 rounded-xl shadow-lg border border-blue-100">
+                    
+                    <div class="mb-4">
+                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">${translate('Your Name')}</label>
+                        <input type="text" id="name" name="name" required
+                               class="w-full px-4 py-2 border border-gray-400 rounded-lg 
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"> 
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="email" class="block text-sm font-medium text-gray-700 mb-1">${translate('Your Email')}</label>
+                        <!-- Formspree will use the value of 'email' field as the reply-to address -->
+                        <input type="email" id="email" name="email" required
+                               class="w-full px-4 py-2 border border-gray-400 rounded-lg 
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"> 
+                    </div>
+
+                    <div class="mb-4">
+                        <label for="subject" class="block text-sm font-medium text-gray-700 mb-1">${translate('Reason for Contact')}</label>
+                        <!-- The name '_subject' tells Formspree to use this value as the email subject line -->
+                        <input type="text" id="subject" name="_subject" required
+                               placeholder="${translate('e.g., General Inquiry, Partnership, Technical Issue')}"
+                               class="w-full px-4 py-2 border border-gray-400 rounded-lg 
+                               focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"> 
+                    </div>
+
+                    <div class="mb-6">
+                        <label for="message" class="block text-sm font-medium text-gray-700 mb-1">${translate('Detailed Message')}</label>
+                        <textarea id="message" name="message" rows="5" required
+                                  class="w-full px-4 py-2 border border-gray-400 rounded-lg 
+                                  focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition duration-150"></textarea> 
+                    </div>
+                    
+                    <!-- Formspree success redirect (optional, keeps user on the page) -->
+                    <input type="hidden" name="_next" value="${window.location.href}">
+
+                    <button type="submit" 
+                            class="w-full bg-blue-600 text-white font-bold py-3 rounded-lg hover:bg-blue-700 transition duration-200 shadow-md hover:shadow-lg">
+                        ${translate('Send Message')}
+                    </button>
+                </form>
+
+            </div>
+        </div>
+    `;
+}
     
     function renderFindDealer() {
         // ... (Find Dealer rendering code is omitted for brevity)
